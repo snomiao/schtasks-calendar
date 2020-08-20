@@ -11,7 +11,7 @@ Type into the title field in the following format:
 - `[ ...taskname ]( ...local_application_path )`
 
 Example:
-- `[ view schtasks-calendar ]( https://github.com/snomiao/schtasks-calendar )`
+- `[ view schtasks-calendar ]( https://github.com/snomiao/schcal )`
 
   ![]( images/view-schtasks-calendar.png)
 
