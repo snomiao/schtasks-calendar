@@ -5,6 +5,7 @@ Google calendar events that contains a markdown link will be sync to windows sch
 ## Get Started
 
 ### 1. First you may need to add some events in the next few days.
+
 Fill in summary in the following format:
 - `[ ...taskname ]( ...link )`
 - `[ ...taskname ]( ...local_application_path )`
@@ -12,13 +13,15 @@ Fill in summary in the following format:
 Example:
 - `[ view schtasks-calendar ]( https://github.com/snomiao/schtasks-calendar )`
 
-  ![](view-schtasks-calendar.png)
+  ![]( images/view-schtasks-calendar.png)
 
 ### 2. Then goto the calendar settings.
-- Scroll down and copy the private ics url
+
+Scroll down and copy the private ics url
   
-  ![](the-private-ics-url.png)
-- And you'll get the ics url https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
+![]( images/the-private-ics-url.png)
+
+And you'll get the ics url https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 
 
 ### 3. Then run as the command params.
@@ -32,11 +35,15 @@ Example:
 npx schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 ```
 
+You will see this
+
+![]( images/npx%20schcal.png )
+
 ### 4. Check your schtasks
 
 Press `Win + R` and run `taskschd.msc` to open Windows Tasks Scheduler
 
-![](Windows%20Tasks%20Scheduler%20SSAC%20task.png)
+![]( images/Windows%20Tasks%20Scheduler%20SSAC%20task.png )
 
 The task `SSAC-0820-0530-view schtasks-calendar-XXXXXX` is the event you just added to calendar and the link will be open on time.
 
@@ -62,7 +69,7 @@ Then run `schtasks /Run /tn SSAC` to test this schtasks.
 npx schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 ```
 
-or
+Or
 
 ```sh
 npm i schtasks-calendar -g
@@ -71,10 +78,12 @@ schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxx
 
 ### Run by `config.yaml`
 
+Make a `config.yaml` like this
+
 ```yaml
-# 
+# your ics urls, the order is not important
 ICS_URLS:
-  # snomiao
+  # snomiao's private calendar ( demo )
   - https://calendar.google.com/calendar/ical/snomiao%40gmail.com/private-d772b2790a1a73de26afb64188c5ca0a/basic.ics
   # a calendar
   - https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
@@ -90,6 +99,22 @@ HTTP_PROXY: http://localhost:1080
 # Optional, how many days events will add to schtasks, defaults to 7 (then you can run me weekly)
 FORWARD_DAYS: 7
 ```
+
+and run
+
+```sh
+npx schcal
+```
+in your `config.yaml` 's working directory.
+
+## Supported formats
+
+You can put below into summary or descriptions of events which you want to launch the link or programs on the time.
+1. Web Links: `http://...` , `https://...` , `ftp://...` , `file://...`
+1. Markdown Links: `[ ... ]( ... )`
+1. Run Command: `RUN ...`
+
+(supports urls and custom protocal and local files)
 
 ## TODOS
 

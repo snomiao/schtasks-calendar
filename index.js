@@ -1,4 +1,4 @@
-// #!/usr/bin/env node
+#!/usr/bin/env node
 
 // 
 // Copyright © 2020 snomiao@gmail.com
@@ -16,6 +16,7 @@ if (!module.parent) (async () => {
     // READING PARAMS
     const argv = require('yargs')
         .usage('Usage: schcal [options] [...ICS_URLS]')
+        .alias('v', 'version')
         .alias('c', 'config')
         .alias('i', 'ICS_URLS')
         .alias('t', 'CACHE_TIMEOUT')

@@ -1,3 +1,9 @@
+'use strict';
+
+// 
+// Copyright © 2020 snomiao@gmail.com
+// 
+
 const escapeFile = require('escape-filename');
 const fetch = require('node-fetch');
 const httpsProxyAgent = require('https-proxy-agent');
@@ -151,8 +157,10 @@ function getEventAction(event) {
     };
 }
 function runCommandMatch(vEvent) {
-    const matchedContent = (vEvent?.description?.match(/^启动\s+“([\s\S]*)”/mi))
-        || (vEvent?.description?.match(/^RUN\s+(.*)/mi));
+    const matchedContent = (vEvent?.summary?.match(/^启动\s+“([\s\S]*)”/mi))
+        || (vEvent?.summary?.match(/^RUN\s+(.*)/mi))
+        || (vEvent?.description?.match(/^启动\s+“([\s\S]*)”/mi))
+        || (vEvent?.description?.match(/^RUN\s+(.*)/mi))
     return matchedContent && (() => {
         const [, command] = matchedContent;
         return { runCommand: command };
@@ -160,7 +168,10 @@ function runCommandMatch(vEvent) {
 }
 function linkMatch(event) {
     const matchedContent = event?.summary?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
-        || event?.description?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/);
+        || event?.description?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
+        || event?.summary?.match(/(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/)
+        || event?.description?.match(/(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/)
+
     return matchedContent && (() => {
         const [, 标题, 链接] = matchedContent;
         return { runCommand: 链接, taskName: 标题 };
@@ -175,17 +186,11 @@ function getRangeEvents(vEvent, rangeStart, rangeEnd) {
     const _exdate = exdate || [];
     // exdate == [ '2020-03-05': 2020-03-05T09:30:00.000Z { tz: 'Asia/Hong_Kong' } ]
     const exdatesKeys = Object.keys(_exdate); // datestr or undefined
-
     // exdatesKeys == [ '2020-03-05' ]
     const recurrencesKeys = Object.keys(_recurrences); // datestr or undefined
-
-
-
-
     // recurrencesKeys == [ '2020-03-05' ]
     // 
     // First determine a fuzzy range date here, and then filter after calculating the precise beginning and end time
-    // 
     const dates = [start]
         // join rules dates
         .concat(rrule?.between(new Date(rangeStart), new Date(rangeEnd)) || [])
@@ -219,7 +224,7 @@ async function icalObjectFetch(url, cacheTimeout = 0, httpProxy = undefined) {
 }
 
 async function icsFileFetch(url, httpProxy) {
-    console.log(`FETCHING ${url}`);
+    // console.debug(`FETCHING ${url}`);
     return await fetch(url, httpProxy && { agent: new httpsProxyAgent(httpProxy) })
         .then(res => res.text())
         .catch(e => console.error(`Fetch error on URL: ${url} \nError details: ${e}\n\n Maybe you should check your network or you need a proxy to connect to google. `));
