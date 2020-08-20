@@ -1,6 +1,6 @@
 {
   "name": "schcal",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "schtasks-calendar auto add events to windows schtasks from google calendar",
   "main": "index.js",
   "keywords": [
@@ -25,5 +25,5 @@
     "yaml": "^1.10.0",
     "yargs": "^15.4.1"
   },
-  "bin": "index.js"
+  "bin": "cli.js"
 }

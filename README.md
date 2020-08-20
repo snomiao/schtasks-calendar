@@ -120,8 +120,14 @@ You can put below into summary or descriptions of events which you want to launc
 
 - [ ] Translate this into chinese version README.md
 
+## Q&A
+
+- Q: I saw "Unexpected token ." when using npx schcal........
+- A: You need to update your Nodejs to higher than v14.8.0  [Click to download](https://nodejs.org/en/download/)
+
 ## More references and secondary development
 
 - [schtasks | Microsoft Docs]( https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks )
 - [手把手教你使用nodejs编写cli(命令行) - 掘金]( https://juejin.im/post/6844903702453551111 )
 - [PC Automation - IFTTT]( https://ifttt.com/applets/190903p-pc-automation )
+
