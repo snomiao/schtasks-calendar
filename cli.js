@@ -5,7 +5,7 @@
 // 
 // this file is for compatiable to windows and linux and vscode run
 // 
-const main = require('./index')
+const main = require('./schtasks-calendar')
 
 // RUN cli
 if (!module.parent) main().then(console.info).catch(console.error);

@@ -15,6 +15,42 @@ const { promisify } = require('util');
 const isUrl = require('is-url');
 const { env } = require('process');
 const CSV = require('tsv');
+CSV.sep = ',';
+CSV.header = false;
+
+// RUN cli
+if (!module.parent) main().then(console.info).catch(console.error);
+module.exports = main
+
+async function main() {
+    await exec(`chcp 65001`);
+    // READING PARAMS
+    const argv = require('yargs')
+        .usage('Usage: schcal [options] [...ICS_URLS]')
+        .alias('a', 'add-to-schtasks')
+        .alias('c', 'config')
+        .alias('i', 'ICS_URLS')
+        .alias('t', 'CACHE_TIMEOUT')
+        .alias('p', 'HTTP_PROXY')
+        .alias('d', 'FORWARD_DAYS')
+        .alias('v', 'version')
+        .example('schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics', 'load this ics to schtasks')
+        .example('schcal -c config.yaml', 'run with config.yaml')
+        .help('h').alias('h', 'help')
+        .epilog('Copyright (c) 2020 snomiao@gmail.com')
+        .argv;
+    if (argv.a) await exec(`./add-to-schtasks.bat`);
+    await exec(`title SSAC - READING config`);
+    const config = await readConfig(argv);
+    await exec(`title SSAC - GENERATING schtasks commands`);
+    const schtasksCreationObjects = await generateSchtasksCreationObjects(config);
+    await exec(`title SSAC - CLEANING old schtasks`);
+    await cleanOldSchtasks(config);
+    await exec(`title SSAC - IMPORTING new schtasks`);
+    await importNewSchtasks(schtasksCreationObjects);
+    return 'done';
+}
+
 
 async function importNewSchtasks(schtasksCreationObjects) {
     const schtasksCreationCommands = schtasksCreationObjects.map(({ schtasksCommand }) => schtasksCommand);
@@ -37,12 +73,16 @@ async function cleanOldSchtasks(config) {
 exports.cleanOldSchtasks = cleanOldSchtasks;
 
 async function readConfig(argv) {
-    const configPaths = [argv.config, env.CONFIG, 'config.yaml']
-        .filter(fs.existsSync);
-    const configPath = configPaths[0];
-    const configYAML = configPath && yaml.parse(await fs.promises.readFile(configPath, 'utf-8')) || {};
-    // console.log(configYAML);
-    argv.ICS_URLS = [configYAML.ICS_URLS, argv.ICS_URLS, argv._].flat().filter(e => e);
+    const configYAMLs =
+        await Promise.all(
+            [argv.config, env.CONFIG, 'config.yaml', env.USERPROFILE + '/.schcal/config.yaml'].reverse()
+                .filter(fs.existsSync)
+                .map(async configPath => yaml.parse(await fs.promises.readFile(configPath, 'utf-8')))
+        )
+    const configFromYAMLs = configYAMLs
+        .reduce((a, b) => ({ ...a, ...b }), {})
+    // console.log(configFromYAMLs);
+    argv.ICS_URLS = [configFromYAMLs.ICS_URLS, argv.ICS_URLS, argv._].flat().filter(e => e);
     // console.log(argv.ICS_URLS)
     const config = {
         SSAC_PREFIX: 'SSAC-',
@@ -50,16 +90,15 @@ async function readConfig(argv) {
         HTTP_PROXY: '',
         CACHE_TIMEOUT: 0,
         ...env,
-        ...configYAML,
+        ...configFromYAMLs,
         ...argv,
     };
-
     return config;
 }
 exports.readConfig = readConfig;
 
 async function runSchtasksCommands(schtasksCommands) {
-    await exec('chcp 65001'); // run below command in utf8 encoding
+    // await exec('chcp 65001'); // run below command in utf8 encoding
     const exec_outputs = await Promise.all(
         schtasksCommands.map(async (schtasksCommand) => ({ schtasksCommand, ...await promisify(exec)(schtasksCommand) })
         ));
@@ -77,11 +116,15 @@ async function generateSchtasksCreationObjects(config) {
     return actions
         .map(({ taskName, startDateString, endDateString, runCommand }) => {
             // console.log({ startDateString, endDateString, runCommand });
-            const schtasksCommand = getSchtasksObject(taskName, startDateString, endDateString, runCommand, SSAC_PREFIX);
-            // console.log(schtasksCommand);
-            return schtasksCommand;
-        });
+            const schtasksObject = getSchtasksObject(taskName, startDateString, endDateString, runCommand, SSAC_PREFIX);
+            // console.log(schtasksObject);
+            return schtasksObject;
+        })
+        .sort((a, b) => a.schtasksName.localeCompare(b.schtasksName))
+        .map(e => (console.log(e.schtasksName), e))
+
 }
+
 exports.generateSchtasksCreationObjects = generateSchtasksCreationObjects;
 function getSchtasksObject(taskName, startDateString, endDateString, runCommand, SSAC_PREFIX) {
     const S = DateTimeAssembly(currentTimeZoneDateDecompose(new Date(startDateString)));
@@ -98,7 +141,7 @@ function getSchtasksObject(taskName, startDateString, endDateString, runCommand,
     const taskID = taskStartDate.toISOString() + '-' + runCommand;
     const taskHash = sha256(taskID);
     const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}`;
-    console.log(schtasksName);
+    // console.log(schtasksName);
     // TODO FIXME: 貌似普通指令没有静默成功…… 
     const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + runCommand : 'cmd /c start "SAC" "' + runCommand + '"';
     const taskParams = `/TN ${getSafeCommandParamString(escapeFile.escape(schtasksName))} /TR ${getSafeCommandParamString(slientlyRunCommand)}`;
@@ -113,7 +156,7 @@ function currentTimeZoneDateDecompose(date) {
     return { 年, 月, 日, 时, 分, 秒, 毫秒 };;
 }
 function getSafeCommandParamString(串) {
-    return '"' + 串.replace(/"/g, '\\"') + '"';
+    return '"' + 串.replace(/"/g, '\\"').replace(/[<>\/\\:~%]/, '-') + '"';
 }
 function DateTimeAssembly(分解时刻) {
     const { 年, 月, 日, 时, 分, 秒 } = 分解时刻;
@@ -150,10 +193,10 @@ function getEventAction(event) {
         linkMatch(event) ||
         runCommandMatch(event));
     return action && {
-        taskName: summary,
         startDateString: start.toLocaleString(),
         endDateString: end.toLocaleString(),
-        ...action
+        ...action,
+        taskName: action.taskName || summary,
     };
 }
 function runCommandMatch(vEvent) {
