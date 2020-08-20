@@ -97,7 +97,7 @@ function getSchtasksObject(taskName, startDateString, endDateString, runCommand,
     const taskStartDateShortString = new Date(new Date(startDateString) - new Date().getTimezoneOffset() * 60e3).toISOString().replace(/[^\dT]/g, '').replace('T', '-').slice(4, 8 + 4 + 1);
     const taskID = taskStartDate.toISOString() + '-' + runCommand;
     const taskHash = sha256(taskID);
-    const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}-${taskHash}`;
+    const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}`;
     console.log(schtasksName);
     // TODO FIXME: 貌似普通指令没有静默成功…… 
     const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + runCommand : 'cmd /c start "SAC" "' + runCommand + '"';
@@ -167,6 +167,7 @@ function runCommandMatch(vEvent) {
     })();
 }
 function linkMatch(event) {
+    // markdown style
     const matchedContent = event?.summary?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
         || event?.description?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
         || event?.summary?.match(/(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/)
