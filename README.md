@@ -16,7 +16,7 @@ Example:
   ![]( images/view-schtasks-calendar.png)
 
 ### 2. Then go to the calendar settings.
-
+<!-- TODO: NEED MORE IMAGES -->
 Scroll down and copy the private ics url
   
 ![]( images/the-private-ics-url.png)
@@ -91,7 +91,7 @@ schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxx
 Make a `config.yaml` like this
 
 ```yaml
-# your ics urls, the order is not important ?????????????????????
+# Your ics urls, the order is not important
 ICS_URLS:
   # snomiao's private calendar ( demo )
   - https://calendar.google.com/calendar/ical/snomiao%40gmail.com/private-d772b2790a1a73de26afb64188c5ca0a/basic.ics
@@ -100,14 +100,14 @@ ICS_URLS:
   # another calendar
   - https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 
-# Optional, if you want cache the ??????????????????????... default value is 0 (no cache and never save a cache file)
-CACHE_TIMEOUT: 3600e3
+# Optional, if you want cache the ics (usually for debuging)... default value is 0 (no cache and never save a cache file)
+# CACHE_TIMEOUT: 3600e3 # one hour
 
 # Optional, if you need a proxy for Google... Otherwise you can delete this line. default value is empty
 HTTP_PROXY: http://localhost:1080
 
-# Optional, how many days events will add to schtasks, default value is 7 (then you can run this weekly) ??????????????????????????
-FORWARD_DAYS: 7
+# Optional, how many days events will add to schtasks, default value is 7 (then this program will )
+FORWARD_DAYS: 7        # TODO NEED A DIAGRAM
 ```
 
 and run
@@ -119,7 +119,8 @@ in the working directory with `config.yaml` .
 
 ## Supported formats
 
-You can put below into the title or description fields of events *******************which you want to launch the link or programs on the time.******************
+You can put below into the title or description fields of events **which you want to launch the link or programs on the time.**
+
 1. Web Links: `http://...` , `https://...` , `ftp://...` , `file://...`
 1. Markdown Links: `[ ... ]( ... )`
 1. Run Command: `RUN ...`
@@ -128,14 +129,14 @@ You can put below into the title or description fields of events ***************
 
 ## TODOS
 
-- [ ] Translate this into chinese version README.md ************Yeah good for you.
+- [ ] Translate this into chinese version README.md 
 
-## Q&A
+## Q & A
 
 - Q: I saw "Unexpected token ." when using `npx schcal`........
 - A: You need to update your Nodejs to higher than v14.8.0  [Click to download](https://nodejs.org/en/download/)
 
-## References and **********************secondary development
+## References
 
 - [schtasks | Microsoft Docs]( https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks )
 - [手把手教你使用nodejs编写cli(命令行) - 掘金]( https://juejin.im/post/6844903702453551111 )
