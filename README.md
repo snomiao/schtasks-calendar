@@ -132,7 +132,7 @@ You can put below into summary or descriptions of events which you want to launc
 
 ## Q&A
 
-- Q: I saw "Unexpected token ." when using npx schcal........
+- Q: I saw "Unexpected token ." when using `npx schcal`........
 - A: You need to update your Nodejs to higher than v14.8.0  [Click to download](https://nodejs.org/en/download/)
 
 ## More references and secondary development
