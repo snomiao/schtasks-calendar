@@ -5,8 +5,8 @@ cd %~dp0
 echo current dir %~dp0
 echo myself      %0
 
+cd %~dp0
 npx schcal > schcal.log
-
 schtasks /Create /tn SSAC /sc daily /st 17:00 /tr %0 /F
 
 

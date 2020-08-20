@@ -51,15 +51,25 @@ The task `SSAC-0820-0530-view schtasks-calendar-XXXXXX` is the event you just ad
 
 If you want to keep using this and you can config the auto update (daily or whatever).
 
-`config.yaml`
+1. run `mkdir schcal` to create a directory.
+2. Put config file as below
+`schcal/config.yaml`
 ```yaml
 ICS_URLS:
   - https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 ```
 
-Then run `add-to-schtasks.bat` which will update your 17:00 every day (you can change this by edit the bat file)
+3. put batch file as below
+`schcal/on-schtask.bat`
+```bat
+cd %~dp0
+npx schcal > ./schcal.log
+schtasks /Create /tn SSAC /sc daily /st 17:00 /tr %0 /F
+```
 
-Then run `schtasks /Run /tn SSAC` to test this schtasks.
+4. Then run `on-schtask.bat` which will update your 17:00 every day (you can change this by edit the bat file)
+
+5. Then run `schtasks /Run /tn SSAC` to test this schtasks.
 
 ## Other Methods
 
