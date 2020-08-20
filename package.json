@@ -1,13 +1,12 @@
 {
   "name": "schcal",
-  "version": "1.0.2",
-  "description": "auto add events to windows schtasks from google calendar",
+  "version": "1.0.5",
+  "description": "schtasks-calendar auto add events to windows schtasks from google calendar",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "snomiao@gmail.com",
-  "readme": "docs/README.md",
   "repository": "git://github.com/snomiao/schtasks-calendar.git",
   "license": "ISC",
   "dependencies": {
