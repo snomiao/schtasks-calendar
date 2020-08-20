@@ -9,21 +9,23 @@ CSV.sep = ',';
 CSV.header = false;
 
 async function main() {
+    await exec(`chcp 65001`);
     // READING PARAMS
     const argv = require('yargs')
         .usage('Usage: schcal [options] [...ICS_URLS]')
-        .alias('v', 'version')
+        .alias('a', 'add-to-schtasks')
         .alias('c', 'config')
         .alias('i', 'ICS_URLS')
         .alias('t', 'CACHE_TIMEOUT')
         .alias('p', 'HTTP_PROXY')
         .alias('d', 'FORWARD_DAYS')
+        .alias('v', 'version')
         .example('schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics', 'load this ics to schtasks')
         .example('schcal -c config.yaml', 'run with config.yaml')
-        .help('h')
-        .alias('h', 'help')
+        .help('h').alias('h', 'help')
         .epilog('Copyright (c) 2020 snomiao@gmail.com')
         .argv;
+    if (argv.a) await exec(`./add-to-schtasks.bat`);
     await exec(`title SSAC - READING config`);
     const config = await readConfig(argv);
     await exec(`title SSAC - GENERATING schtasks commands`);

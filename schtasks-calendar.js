@@ -3,7 +3,6 @@
 // 
 
 'use strict';
-
 const escapeFile = require('escape-filename');
 const fetch = require('node-fetch');
 const httpsProxyAgent = require('https-proxy-agent');
@@ -26,7 +25,7 @@ async function importNewSchtasks(schtasksCreationObjects) {
 exports.importNewSchtasks = importNewSchtasks;
 
 async function cleanOldSchtasks(config) {
-    await exec('chcp 65001'); // run below command in utf8 encoding
+    // await exec('chcp 65001'); // run below command in utf8 encoding
     const csv = CSV.parse((await promisify(exec)("schtasks /query /fo csv /nh")).stdout);
     const ssacTaskNames = csv.map(([taskPath]) => taskPath.slice(1)).filter(e => e).filter(e => e.startsWith(config.SSAC_PREFIX));
     const schtasksDeletionCommands = ssacTaskNames.map(taskName => `schtasks /Delete /tn ${getSafeCommandParamString(taskName)} /F`);
