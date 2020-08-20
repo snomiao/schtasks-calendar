@@ -19,6 +19,7 @@
     "escape-filename": "^1.1.2",
     "https-proxy-agent": "^5.0.0",
     "ical": "^0.8.0",
+    "innertext": "^1.0.3",
     "is-url": "^1.2.4",
     "node-fetch": "^2.6.0",
     "tsv": "^0.2.0",

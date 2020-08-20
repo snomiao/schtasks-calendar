@@ -12,6 +12,7 @@ const fs = require('fs');
 const yaml = require('yaml');
 const { exec } = require('child_process');
 const { promisify } = require('util');
+const innertext = require("innertext")
 const isUrl = require('is-url');
 const { env } = require('process');
 const CSV = require('tsv');
@@ -143,7 +144,7 @@ function getSchtasksObject(taskName, startDateString, endDateString, runCommand,
     const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}`;
     // console.log(schtasksName);
     // TODO FIXME: 貌似普通指令没有静默成功…… 
-    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + runCommand : 'cmd /c start "SAC" "' + runCommand + '"';
+    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + runCommand : 'CMD /c start "SSAC" "' + runCommand + '"';
     const taskParams = `/TN ${getSafeCommandParamString(escapeFile.escape(schtasksName))} /TR ${getSafeCommandParamString(slientlyRunCommand)}`;
     // console.log(taskParams);
     const schtasksCommand = `schtasks /Create ${taskParams} ${dateParams} /F`;
@@ -199,22 +200,30 @@ function getEventAction(event) {
         taskName: action.taskName || summary,
     };
 }
-function runCommandMatch(vEvent) {
-    const matchedContent = (vEvent?.summary?.match(/^启动\s+“([\s\S]*)”/mi))
-        || (vEvent?.summary?.match(/^RUN\s+(.*)/mi))
-        || (vEvent?.description?.match(/^启动\s+“([\s\S]*)”/mi))
-        || (vEvent?.description?.match(/^RUN\s+(.*)/mi))
+function runCommandMatch(event) {
+    // BEWARE the description is a HTML but what we just want want a plain text.
+    const description = innertext(event?.description?.replace(/<br.*?>/, '\n') || '')
+    const summary = event?.summary
+    //
+    const matchedContent = null
+        || (summary?.match(/^启动\s+“([\s\S]*)”/mi))
+        || (description?.match(/^启动\s+“([\s\S]*)”/mi))
+        || (summary?.match(/^RUN\s+(.*)/mi))
+        || (description?.match(/^RUN\s+(.*)/mi))
     return matchedContent && (() => {
         const [, command] = matchedContent;
         return { runCommand: command };
     })();
 }
 function linkMatch(event) {
+    // BEWARE the description is a HTML but what we just want want a plain text.
+    const description = innertext(event?.description?.replace(/<br.*?>/, '\n') || '')
+    const summary = event?.summary
     // markdown style
-    const matchedContent = event?.summary?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
-        || event?.description?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
-        || event?.summary?.match(/(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/)
-        || event?.description?.match(/(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/)
+    const matchedContent = summary?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
+        || description?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
+        || summary?.match(/(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/)
+        || description?.match(/(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/)
 
     return matchedContent && (() => {
         const [, 标题, 链接] = matchedContent;
