@@ -43,7 +43,7 @@ async function readConfig(argv) {
     const configYAML = configPath && yaml.parse(await fs.promises.readFile(configPath, 'utf-8')) || {};
     // console.log(configYAML);
     argv.ICS_URLS = [configYAML.ICS_URLS, argv.ICS_URLS, argv._].flat().filter(e => e);
-    console.log(argv.ICS_URLS)
+    // console.log(argv.ICS_URLS)
     const config = {
         SSAC_PREFIX: 'SSAC-',
         FORWARD_DAYS: 7,
