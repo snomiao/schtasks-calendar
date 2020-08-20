@@ -1,12 +1,12 @@
 # schtasks-calendar (or schcal)
 
-Google calendar events that contains a markdown link will be sync to Windows Task Scheduler so that the link will open automatically on time on your PC.
+Synchronizes (or clones) Google Calendar events containing a markdown link to Windows Task Scheduler to automatically open the link on time on your PC.
 
 ## Get Started
 
-### 1. Suppose you need to add some events in the next few days.
+### 1. Add events to Google Calendar (let's say, in the next few days).
 
-Fill into the title field in the following format:
+Type into the title field in the following format:
 - `[ ...taskname ]( ...link )`
 - `[ ...taskname ]( ...local_application_path )`
 
@@ -15,16 +15,16 @@ Example:
 
   ![]( images/view-schtasks-calendar.png)
 
-### 2. Then go to the calendar settings.
+### 2. Then go to the settings for the particular calendar (in the hamburgur menu on the left), or go to `Settings for my calendars` section (in the main settings) for the particular calendar to be exported.
 
 Scroll down and copy the private ics url
   
 ![]( images/the-private-ics-url.png)
 
 And you should get the ics url https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
+Copy and save it for step 3.
 
-
-### 3. Then run using the command params.
+### 3. Then run using the command parameters.
 
 ```sh
 npx schcal YOUR_ICS_URL
@@ -35,7 +35,7 @@ Example:
 npx schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 ```
 
-You will see this
+You should see this
 
 ![]( images/npx%20schcal.png )
 
@@ -45,11 +45,11 @@ Press `Win + R` and type `taskschd.msc` to open Windows Task Scheduler
 
 ![]( images/Windows%20Tasks%20Scheduler%20SSAC%20task.png )
 
-The task `SSAC-0820-0530-view schtasks-calendar-XXXXXX` corresponds to the event you just added to calendar and the link will be opened on time.
+The task `SSAC-0820-0530-view schtasks-calendar-XXXXXX` corresponds to the event you just added to Google Calendar and the link contained will be opened on time.
 
-### 5. Configuring schtasks auto update (daily or whatever)
+### 5. Configure schtasks auto update (daily or whenever)
 
-If you want to keep using this, you can configure the auto update (daily or whatever).
+If you want to keep using this, you can configure the auto update (daily or whenever).
 
 1. Run `mkdir schcal` in command line to create a directory.
 2. Write the following to the config file
@@ -91,7 +91,7 @@ schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxx
 Make a `config.yaml` like this
 
 ```yaml
-# your ics urls, the order is not important ?????????????????????
+# your ics urls, the order is not important
 ICS_URLS:
   # snomiao's private calendar ( demo )
   - https://calendar.google.com/calendar/ical/snomiao%40gmail.com/private-d772b2790a1a73de26afb64188c5ca0a/basic.ics
@@ -100,13 +100,13 @@ ICS_URLS:
   # another calendar
   - https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 
-# Optional, if you want cache the ??????????????????????... default value is 0 (no cache and never save a cache file)
+# Optional, if you want to cache the.. default value is 0 (no cache and never save a cache file)
 CACHE_TIMEOUT: 3600e3
 
-# Optional, if you need a proxy for Google... Otherwise you can delete this line. default value is empty
+# Optional, if you need a proxy for Google... Otherwise you can delete this line. Default value is empty.
 HTTP_PROXY: http://localhost:1080
 
-# Optional, how many days events will add to schtasks, default value is 7 (then you can run this weekly) ??????????????????????????
+# Optional, how many days events will add to schtasks, default value is 7 (then you can run this weekly)
 FORWARD_DAYS: 7
 ```
 
@@ -115,11 +115,11 @@ and run
 ```sh
 npx schcal
 ```
-in the working directory with `config.yaml` .
+in the working directory containing `config.yaml` .
 
 ## Supported formats
 
-You can put below into the title or description fields of events *******************which you want to launch the link or programs on the time.******************
+You can put *one* link (for now, support for multiple links in development) of the following into the title or description fields of events to be launched at scheduled times.
 1. Web Links: `http://...` , `https://...` , `ftp://...` , `file://...`
 1. Markdown Links: `[ ... ]( ... )`
 1. Run Command: `RUN ...`
@@ -128,14 +128,14 @@ You can put below into the title or description fields of events ***************
 
 ## TODOS
 
-- [ ] Translate this into chinese version README.md ************Yeah good for you.
+- [ ] Translate this into chinese version README.md
 
 ## Q&A
 
-- Q: I saw "Unexpected token ." when using `npx schcal`........
+- Q: I saw "Unexpected token ." when using `npx schcal`.
 - A: You need to update your Nodejs to higher than v14.8.0  [Click to download](https://nodejs.org/en/download/)
 
-## References and **********************secondary development
+## References and further readings
 
 - [schtasks | Microsoft Docs]( https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks )
 - [手把手教你使用nodejs编写cli(命令行) - 掘金]( https://juejin.im/post/6844903702453551111 )
