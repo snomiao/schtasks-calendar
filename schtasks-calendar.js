@@ -201,7 +201,7 @@ function getEventAction(event) {
     };
 }
 function runCommandMatch(event) {
-    // BEWARE the description is a HTML but what we just want want a plain text.
+    // BEWARE the description can be plain text OR HTML but what we just want want a plain text.
     const description = innertext(event?.description?.replace(/<br.*?>/, '\n') || '')
     const summary = event?.summary
     //
@@ -216,7 +216,7 @@ function runCommandMatch(event) {
     })();
 }
 function linkMatch(event) {
-    // BEWARE the description is a HTML but what we just want want a plain text.
+    // BEWARE the description can be plain text OR HTML but what we just want want a plain text.
     const description = innertext(event?.description?.replace(/<br.*?>/, '\n') || '')
     const summary = event?.summary
     // markdown style
