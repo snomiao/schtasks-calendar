@@ -144,8 +144,11 @@ function getSchtasksObject(taskName, startDateString, endDateString, runCommand,
     const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}`;
     // console.log(schtasksName);
     // TODO FIXME: 貌似普通指令没有静默成功…… 
-    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + runCommand : 'CMD /c start "SSAC" "' + runCommand + '"';
-    const taskParams = `/TN ${getSafeCommandParamString(escapeFile.escape(schtasksName))} /TR ${getSafeCommandParamString(slientlyRunCommand)}`;
+    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + `"${runCommand}"` : 'CMD /c start "SSAC" "' + runCommand + '"';
+    // 
+    const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName).replace(/[<>\/\\:~%]/, '-'))
+    const safeTR = getSafeCommandParamString(slientlyRunCommand)
+    const taskParams = `/TN ${safeTaskname} /TR ${safeTR}`;
     // console.log(taskParams);
     const schtasksCommand = `schtasks /Create ${taskParams} ${dateParams} /F`;
     // ref: [windows - How do you schedule a task (using schtasks.exe) to run once and delete itself? - Super User]( https://superuser.com/questions/1038528/how-do-you-schedule-a-task-using-schtasks-exe-to-run-once-and-delete-itself )
@@ -157,7 +160,7 @@ function currentTimeZoneDateDecompose(date) {
     return { 年, 月, 日, 时, 分, 秒, 毫秒 };;
 }
 function getSafeCommandParamString(串) {
-    return '"' + 串.replace(/"/g, '\\"').replace(/[<>\/\\:~%]/, '-') + '"';
+    return '"' + 串.replace(/"/g, '\\"') + '"';
 }
 function DateTimeAssembly(分解时刻) {
     const { 年, 月, 日, 时, 分, 秒 } = 分解时刻;
