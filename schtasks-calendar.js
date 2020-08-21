@@ -144,13 +144,13 @@ function getSchtasksObject(taskName, startDateString, endDateString, runCommand,
     const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}`;
     // console.log(schtasksName);
     // TODO FIXME: 貌似普通指令没有静默成功…… 
-    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + `"${runCommand}"` : 'CMD /c start "SSAC" "' + runCommand + '"';
+    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + `"${runCommand.replace(/&/, '^&')}"` : 'CMD /c start "SSAC" "' + runCommand + '"';
     // 
     const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName).replace(/[<>\/\\:~%]/, '-'))
     const safeTR = getSafeCommandParamString(slientlyRunCommand)
     const taskParams = `/TN ${safeTaskname} /TR ${safeTR}`;
     // console.log(taskParams);
-    const schtasksCommand = `schtasks /Create ${taskParams} ${dateParams} /F`;
+    const schtasksCommand = `schtasks /Create /F ${dateParams} ${taskParams}`;
     // ref: [windows - How do you schedule a task (using schtasks.exe) to run once and delete itself? - Super User]( https://superuser.com/questions/1038528/how-do-you-schedule-a-task-using-schtasks-exe-to-run-once-and-delete-itself )
     return { schtasksName, schtasksCommand };
 }
