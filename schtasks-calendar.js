@@ -13,6 +13,7 @@ const yaml = require('yaml');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 const innertext = require("innertext")
+const innerText = (s) => innertext(s.replace(/<br.*?>/g, '\n').replace(/\<.*?\>/g, ''))
 const isUrl = require('is-url');
 const { env } = require('process');
 const CSV = require('tsv');
@@ -126,6 +127,8 @@ async function generateSchtasksCreationObjects(config) {
 
 }
 
+// [Exe文件开机启动，隐藏运行窗口运行_问道-CSDN博客_开机隐藏运行exe]( https://blog.csdn.net/llag_haveboy/article/details/84675145 )
+// `wscript.createObject("wscript.shell").Run("cmd.exe /C C:\gz\gz.exe", 0, TRUE)`
 exports.generateSchtasksCreationObjects = generateSchtasksCreationObjects;
 function getSchtasksObject(taskName, startDateString, endDateString, runCommand, SSAC_PREFIX) {
     const S = DateTimeAssembly(currentTimeZoneDateDecompose(new Date(startDateString)));
@@ -144,9 +147,9 @@ function getSchtasksObject(taskName, startDateString, endDateString, runCommand,
     const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}`;
     // console.log(schtasksName);
     // TODO FIXME: 貌似普通指令没有静默成功…… 
-    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + `"${runCommand.replace(/&/, '^&')}"` : 'CMD /c start "SSAC" "' + runCommand + '"';
+    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + `"${runCommand.replace(/&/g, '^&')}"` : 'CMD /c start "SSAC" "' + runCommand + '"';
     // 
-    const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName).replace(/[<>\/\\:~%]/, '-'))
+    const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName).replace(/[<>\/\\:~%]/g, '-'))
     const safeTR = getSafeCommandParamString(slientlyRunCommand)
     const taskParams = `/TN ${safeTaskname} /TR ${safeTR}`;
     // console.log(taskParams);
@@ -205,7 +208,7 @@ function getEventAction(event) {
 }
 function runCommandMatch(event) {
     // BEWARE the description can be plain text OR HTML but what we just want want a plain text.
-    const description = innertext(event?.description?.replace(/<br.*?>/, '\n') || '')
+    const description = innerText(event?.description || '') // ASSUME THE HTML IS GOOD AT FORMAT
     const summary = event?.summary
     //
     const matchedContent = null
@@ -220,7 +223,7 @@ function runCommandMatch(event) {
 }
 function linkMatch(event) {
     // BEWARE the description can be plain text OR HTML but what we just want want a plain text.
-    const description = innertext(event?.description?.replace(/<br.*?>/, '\n') || '')
+    const description = innerText(event?.description || '') // ASSUME THE HTML IS GOOD AT FORMAT
     const summary = event?.summary
     // markdown style
     const matchedContent = summary?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/)
