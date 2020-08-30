@@ -12,8 +12,8 @@ const fs = require('fs');
 const yaml = require('yaml');
 const { exec } = require('child_process');
 const { promisify } = require('util');
-const innertext = require("innertext")
-const innerText = (s) => innertext(s.replace(/<br.*?>/g, '\n').replace(/\<.*?\>/g, ''))
+// const innertext = require("innertext")
+const innerText = (s) => s.replace(/<br.*?>/g, '\n').replace(/\<.*?\>/g, '')
 const isUrl = require('is-url');
 const { env } = require('process');
 const CSV = require('tsv');
