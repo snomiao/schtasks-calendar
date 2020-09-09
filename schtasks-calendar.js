@@ -27,7 +27,7 @@ function unescapeHtml(unsafe) {
 const isUrl = require('is-url');
 const { env } = require('process');
 const CSV = require('tsv');
-const { mkCommandWrapperFile } = require("./mkCommandWrapperFile.ts");
+const { mkCommandWrapperFile } = require("./mkCommandWrapperFile.js");
 const { icalObjectFetch } = require("./icalObjectFetch.js");
 CSV.sep = ',';
 CSV.header = false;
