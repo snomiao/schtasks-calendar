@@ -4,19 +4,31 @@
 
 'use strict';
 const escapeFile = require('escape-filename');
-const fetch = require('node-fetch');
-const httpsProxyAgent = require('https-proxy-agent');
+// const = require('node-fetch');
+// const = require('https-proxy-agent');
 const sha256 = require('crypto-js/sha256');
-const ical = require('ical');
+const path = require('path');
+// const = require('ical');
 const fs = require('fs');
 const yaml = require('yaml');
 const { exec } = require('child_process');
 const { promisify } = require('util');
 // const innertext = require("innertext")
-const innerText = (s) => s.replace(/<br.*?>/g, '\n').replace(/\<.*?\>/g, '')
+const innerText = (s) => unescapeHtml(s.replace(/<br.*?>/g, '\n').replace(/\<.*?\>/g, ''))
+function unescapeHtml(unsafe) {
+    return unsafe
+        .replace(/&nbsp;/g, " ")
+        .replace(/&amp;/g, "&")
+        .replace(/&lt;/g, "<")
+        .replace(/&gt;/g, ">")
+        .replace(/&quot;/g, "\"")
+        .replace(/&#039;/g, "'");
+}
 const isUrl = require('is-url');
 const { env } = require('process');
 const CSV = require('tsv');
+const { mkCommandWrapperFile } = require("./mkCommandWrapperFile.ts");
+const { icalObjectFetch } = require("./icalObjectFetch.js");
 CSV.sep = ',';
 CSV.header = false;
 
@@ -52,7 +64,6 @@ async function main() {
     await importNewSchtasks(schtasksCreationObjects);
     return 'done';
 }
-
 
 async function importNewSchtasks(schtasksCreationObjects) {
     const schtasksCreationCommands = schtasksCreationObjects.map(({ schtasksCommand }) => schtasksCommand);
@@ -114,14 +125,14 @@ async function generateSchtasksCreationObjects(config) {
     console.assert(ICS_URLS?.length, 'CONFIG ERROR... ICS_URLS is empty, maybe you should write a config file or put a ics URL as a param...\nMore infomation can be found in https://github.com/snomiao/schtasks-calendar');
     if (!ICS_URLS?.length)
         process.exit(1);
-    const actions = await 多日历将行动作列抓取(ICS_URLS, CACHE_TIMEOUT, HTTP_PROXY, FORWARD_DAYS);
-    return actions
-        .map(({ taskName, startDateString, endDateString, runCommand }) => {
-            // console.log({ startDateString, endDateString, runCommand });
-            const schtasksObject = getSchtasksObject(taskName, startDateString, endDateString, runCommand, SSAC_PREFIX);
+    const actions = await fetchCalendarsEventsActions(ICS_URLS, CACHE_TIMEOUT, HTTP_PROXY, FORWARD_DAYS);
+    return (await Promise.all(actions
+        .map(async ({ taskName, startDateString, endDateString, commandOrURL }) => {
+            // console.log({ startDateString, endDateString, commandOrURL });
+            const schtasksObject = await getSchtasksObject(taskName, startDateString, endDateString, commandOrURL, SSAC_PREFIX);
             // console.log(schtasksObject);
             return schtasksObject;
-        })
+        })))
         .sort((a, b) => a.schtasksName.localeCompare(b.schtasksName))
         .map(e => (console.log(e.schtasksName), e))
 
@@ -130,7 +141,7 @@ async function generateSchtasksCreationObjects(config) {
 // [Exe文件开机启动，隐藏运行窗口运行_问道-CSDN博客_开机隐藏运行exe]( https://blog.csdn.net/llag_haveboy/article/details/84675145 )
 // `wscript.createObject("wscript.shell").Run("cmd.exe /C C:\gz\gz.exe", 0, TRUE)`
 exports.generateSchtasksCreationObjects = generateSchtasksCreationObjects;
-function getSchtasksObject(taskName, startDateString, endDateString, runCommand, SSAC_PREFIX) {
+async function getSchtasksObject(taskName, startDateString, endDateString, commandOrURL, SSAC_PREFIX) {
     const S = DateTimeAssembly(currentTimeZoneDateDecompose(new Date(startDateString)));
     const E = DateTimeAssembly(currentTimeZoneDateDecompose(new Date(endDateString)));
     // const dateParams = `/SC ONCE /SD ${S.D} /ST ${S.T} /ED ${E.D} /ET ${E.T} /Z`; // the option ONCE does not support /ED (and /Z)
@@ -142,20 +153,28 @@ function getSchtasksObject(taskName, startDateString, endDateString, runCommand,
     // [schtasks | Microsoft Docs]( https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks )
     const taskStartDate = new Date(startDateString);
     const taskStartDateShortString = new Date(new Date(startDateString) - new Date().getTimezoneOffset() * 60e3).toISOString().replace(/[^\dT]/g, '').replace('T', '-').slice(4, 8 + 4 + 1);
-    const taskID = taskStartDate.toISOString() + '-' + runCommand;
+    const taskID = taskStartDate.toISOString() + '-' + commandOrURL;
     const taskHash = sha256(taskID);
     const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}`;
     // console.log(schtasksName);
     // TODO FIXME: 貌似普通指令没有静默成功…… 
-    const slientlyRunCommand = isUrl(runCommand) ? 'explorer ' + `"${runCommand.replace(/&/g, '^&')}"` : 'CMD /c start "SSAC" "' + runCommand + '"';
+
+    // defaults to use a wrapper
+    // const slientlyRunCommandRaw = isUrl(commandOrURL) ? 'explorer ' + `"${escapeCommand(commandOrURL)}"` : 'CMD /c start "SSAC" "' + escapeCommand(commandOrURL) + '"'
+    // const slientlyRunCommand = (slientlyRunCommandRaw.length <= 250) ? slientlyRunCommandRaw : await mkCommandWrapperFile(taskHash, slientlyRunCommandRaw)
+
+    // 全部使用wrapper
+    const slientlyRunCommand = await mkCommandWrapperFile(taskHash, commandOrURL)
     // 
     const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName).replace(/[<>\/\\:~%]/g, '-'))
     const safeTR = getSafeCommandParamString(slientlyRunCommand)
     const taskParams = `/TN ${safeTaskname} /TR ${safeTR}`;
     // console.log(taskParams);
     const schtasksCommand = `schtasks /Create /F ${dateParams} ${taskParams}`;
+
     // ref: [windows - How do you schedule a task (using schtasks.exe) to run once and delete itself? - Super User]( https://superuser.com/questions/1038528/how-do-you-schedule-a-task-using-schtasks-exe-to-run-once-and-delete-itself )
     return { schtasksName, schtasksCommand };
+    function escapeCommand(cmd) { return cmd.replace(/&/g, '^&').replace(/%/g, '%%') }
 }
 function currentTimeZoneDateDecompose(date) {
     const [, 年, 月, 日, 时, 分, 秒, 毫秒] = new Date(+date - new Date().getTimezoneOffset() * 60e3)
@@ -170,28 +189,28 @@ function DateTimeAssembly(分解时刻) {
     return { D: [年, 月, 日].join('/'), T: [时, 分, 秒].join(':') };
 }
 
-async function 多日历将行动作列抓取(ics_urls, cacheTimeout, httpProxy, FORWARD_DAYS) {
-    return (await Promise.all(ics_urls.map(async (ics_url) => await 日历将行动作列抓取(ics_url, cacheTimeout, httpProxy, FORWARD_DAYS)))).flat(1);
+async function fetchCalendarsEventsActions(ics_urls, cacheTimeout, httpProxy, FORWARD_DAYS) {
+    return (await Promise.all(ics_urls.map(async (ics_url) => await fetchCalendarEventsActions(ics_url, cacheTimeout, httpProxy, FORWARD_DAYS)))).flat(1);
 }
 
-async function 日历将行动作列抓取(ics_url, cacheTimeout, httpProxy, FORWARD_DAYS) {
+async function fetchCalendarEventsActions(ics_url, cacheTimeout, httpProxy, FORWARD_DAYS) {
     const icalObject = await icalObjectFetch(ics_url, cacheTimeout, httpProxy);
-    const actions = 日历将行动作列获取(icalObject, FORWARD_DAYS);
+    const actions = parseCalendarEventsActions(icalObject, FORWARD_DAYS);
     return actions;
 }
-function 日历将行动作列获取(icalObject, FORWARD_DAYS) {
+function parseCalendarEventsActions(icalObject, FORWARD_DAYS) {
     return Object.values(icalObject).map(vEvent => {
         if (vEvent.type !== "VEVENT")
             return;
         const [rangeStart, rangeEnd] = [+new Date(), +new Date() + FORWARD_DAYS * 86400e3]; // FORWARD_DAYS days from now
         const events = getRangeEvents(vEvent, rangeStart, rangeEnd);
-        const actions = 事件列动作列获取(events);
+        const actions = getEventsActions(events);
         // events.length && console.debug('events', events);
         // actions.length && console.debug('actions', actions.flat());
         return actions;
     }).filter(e => e).flat(1);
 }
-function 事件列动作列获取(events) {
+function getEventsActions(events) {
     return events.map(getEventAction).filter(e => e);
 }
 function getEventAction(event) {
@@ -206,9 +225,11 @@ function getEventAction(event) {
         taskName: action.taskName || summary,
     };
 }
+
 function runCommandMatch(event) {
     // BEWARE the description can be plain text OR HTML but what we just want want a plain text.
     const description = innerText(event?.description || '') // ASSUME THE HTML IS GOOD AT FORMAT
+    // description.match('share') && console.debug(description);
     const summary = event?.summary
     //
     const matchedContent = null
@@ -218,7 +239,7 @@ function runCommandMatch(event) {
         || (description?.match(/^RUN\s+(.*)/mi))
     return matchedContent && (() => {
         const [, command] = matchedContent;
-        return { runCommand: command };
+        return { commandOrURL: command };
     })();
 }
 function linkMatch(event) {
@@ -233,7 +254,7 @@ function linkMatch(event) {
 
     return matchedContent && (() => {
         const [, 标题, 链接] = matchedContent;
-        return { runCommand: 链接, taskName: 标题 };
+        return { commandOrURL: 链接, taskName: 标题 };
     })();
 }
 function getRangeEvents(vEvent, rangeStart, rangeEnd) {
@@ -272,34 +293,4 @@ function getRangeEvents(vEvent, rangeStart, rangeEnd) {
         // Filter the dates...
         .filter(({ start, end }) => +rangeStart < +end && +rangeStart < +start && +start < +rangeEnd);
 }
-// Do not use cache and proxy by default.
-async function icalObjectFetch(url, cacheTimeout = 0, httpProxy = undefined) {
-    const icalRaw = cacheTimeout
-        ? await fileCached(`cache-${sha256(url)}.ics`, cacheTimeout,
-            async () => await icsFileFetch(url, httpProxy))
-        // if cache is disabled then no file will saved.
-        : await icsFileFetch(url, httpProxy);
-    return ical.parseICS(icalRaw);
-}
 
-async function icsFileFetch(url, httpProxy) {
-    // console.debug(`FETCHING ${url}`);
-    return await fetch(url, httpProxy && { agent: new httpsProxyAgent(httpProxy) })
-        .then(res => res.text())
-        .catch(e => console.error(`Fetch error on URL: ${url} \nError details: ${e}\n\n Maybe you should check your network or you need a proxy to connect to google. `));
-}
-
-async function fileCached(filename, timeout, request) {
-    const stat = await promisify(fs.exists)(filename) && await fs.promises.stat(filename);
-    const mtime = stat?.mtime; // modify time or undefined
-    const isCacheValid = stat && +mtime + timeout > +new Date(); // 1h cache
-    if (isCacheValid) {
-        return await fs.promises.readFile(filename, 'utf-8');
-    }
-    else {
-        console.debug(`cache is expired and it's refreshing... : ${new Date().toISOString()} - ${filename}`);
-        const raw = await request();
-        await fs.promises.writeFile(filename, raw);
-        return raw;
-    }
-}
