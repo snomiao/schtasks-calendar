@@ -166,7 +166,7 @@ async function getSchtasksObject(taskName, startDateString, endDateString, comma
     // 全部使用wrapper
     const slientlyRunCommand = await mkCommandWrapperFile(taskHash, commandOrURL)
     // 
-    const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName).replace(/[<>\/\\:~%]/g, '-'))
+    const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName.slice(0,200)).replace(/[<>\/\\:~%]/g, '-'))
     const safeTR = getSafeCommandParamString(slientlyRunCommand)
     const taskParams = `/TN ${safeTaskname} /TR ${safeTR}`;
     // console.log(taskParams);
