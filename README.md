@@ -55,7 +55,7 @@ If you want to keep using this, you can configure the auto update (daily or when
 
 1. Run `mkdir schcal` in command line to create a directory.
 2. Write the following to the config file
-`schcal/config.yaml`
+`~/.schcal/config.yaml`
 ```yaml
 ICS_URLS:
   - https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics

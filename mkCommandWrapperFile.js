@@ -8,6 +8,9 @@ async function mkCommandWrapperFile(wraperName, commands) {
     const wrapperFolder = path.join(env.USERPROFILE, `/.schcal/wrapper`);
     await fs.promises.mkdir(wrapperFolder, { recursive: true });
     const wrapperPath = path.join(wrapperFolder, `/` + sha256(commands) + ".vbs");
+    if (await fs.promises.exists(commands)) {
+        commands = `"${commands}"`
+    }
     const wrapperContent = `WScript.CreateObject("WScript.Shell").run("${commands.replace(/"/g, '""')}")`;
     await fs.promises.writeFile(wrapperPath, wrapperContent, "utf16le");
     return wrapperPath;
