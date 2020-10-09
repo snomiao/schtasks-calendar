@@ -1,6 +1,6 @@
 {
   "name": "schcal",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "description": "schtasks-calendar auto add events to windows schtasks from google calendar",
   "main": "index.js",
   "keywords": [
@@ -8,7 +8,7 @@
     "calendar"
   ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "npx .",
     "_publish": "npm publish --access public"
   },
   "author": "snomiao@gmail.com",
