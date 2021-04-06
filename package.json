@@ -14,6 +14,7 @@
     "husky": "^5.1.3"
   },
   "scripts": {
+    "build": "",
     "test": "npx .",
     "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
     "postversion": "git push --follow-tags",
