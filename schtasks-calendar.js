@@ -1,21 +1,17 @@
-// 
-// Copyright © 2020 snomiao@gmail.com
-// 
+/**
+ * schtasks-calendar (schcal)
+ * Author: snomiao (snomiao@gmail.com)
+ * 2020-2021
+ */
+const escapeFile = require('escape-filename')
+const sha256 = require('crypto-js/sha256')
+const fs = require('fs')
+const yaml = require('yaml')
+const { exec } = require('child_process')
+const { promisify } = require('util')
 
-'use strict';
-const escapeFile = require('escape-filename');
-// const = require('node-fetch');
-// const = require('https-proxy-agent');
-const sha256 = require('crypto-js/sha256');
-const path = require('path');
-// const = require('ical');
-const fs = require('fs');
-const yaml = require('yaml');
-const { exec } = require('child_process');
-const { promisify } = require('util');
-// const innertext = require("innertext")
-const innerText = (s) => unescapeHtml(s.replace(/<br.*?>/g, '\n').replace(/\<.*?\>/g, ''))
-function unescapeHtml(unsafe) {
+const innerText = (s) => unescapeHTML(s.replace(/<br.*?>/g, '\n').replace(/\<.*?\>/g, ''))
+function unescapeHTML(unsafe) {
     return unsafe
         .replace(/&nbsp;/g, " ")
         .replace(/&amp;/g, "&")
@@ -24,7 +20,6 @@ function unescapeHtml(unsafe) {
         .replace(/&quot;/g, "\"")
         .replace(/&#039;/g, "'");
 }
-const isUrl = require('is-url');
 const { env } = require('process');
 const CSV = require('tsv');
 const { mkCommandWrapperFile } = require("./mkCommandWrapperFile.js");
@@ -94,9 +89,7 @@ async function readConfig(argv) {
         )
     const configFromYAMLs = configYAMLs
         .reduce((a, b) => ({ ...a, ...b }), {})
-    // console.log(configFromYAMLs);
     argv.ICS_URLS = [configFromYAMLs.ICS_URLS, argv.ICS_URLS, argv._].flat().filter(e => e);
-    // console.log(argv.ICS_URLS)
     const config = {
         SSAC_PREFIX: 'SSAC-',
         FORWARD_DAYS: 7,
@@ -158,20 +151,19 @@ async function getSchtasksObject(taskName, startDateString, endDateString, comma
     const schtasksName = SSAC_PREFIX + `${taskStartDateShortString}-${taskName}`;
     // console.log(schtasksName);
     // TODO FIXME: 貌似普通指令没有静默成功…… 
-
+    //
     // defaults to use a wrapper
     // const slientlyRunCommandRaw = isUrl(commandOrURL) ? 'explorer ' + `"${escapeCommand(commandOrURL)}"` : 'CMD /c start "SSAC" "' + escapeCommand(commandOrURL) + '"'
     // const slientlyRunCommand = (slientlyRunCommandRaw.length <= 250) ? slientlyRunCommandRaw : await mkCommandWrapperFile(taskHash, slientlyRunCommandRaw)
-
+    //
     // 全部使用wrapper
     const slientlyRunCommand = await mkCommandWrapperFile(taskHash, commandOrURL)
     // 
-    const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName.slice(0,200)).replace(/[<>\/\\:~%]/g, '-'))
+    const safeTaskname = getSafeCommandParamString(escapeFile.escape(schtasksName.slice(0, 200)).replace(/[<>\/\\:~%]/g, '-'))
     const safeTR = getSafeCommandParamString(slientlyRunCommand)
     const taskParams = `/TN ${safeTaskname} /TR ${safeTR}`;
     // console.log(taskParams);
     const schtasksCommand = `schtasks /Create /F ${dateParams} ${taskParams}`;
-
     // ref: [windows - How do you schedule a task (using schtasks.exe) to run once and delete itself? - Super User]( https://superuser.com/questions/1038528/how-do-you-schedule-a-task-using-schtasks-exe-to-run-once-and-delete-itself )
     return { schtasksName, schtasksCommand };
     function escapeCommand(cmd) { return cmd.replace(/&/g, '^&').replace(/%/g, '%%') }
@@ -186,7 +178,7 @@ function getSafeCommandParamString(串) {
 }
 function DateTimeAssembly(分解时刻) {
     const { 年, 月, 日, 时, 分, 秒 } = 分解时刻;
-    return { D: [年, 月, 日].join('/'), T: [时, 分, 秒].join(':') };
+    return { D: [月, 日, 年].join('/'), T: [时, 分, 秒].join(':') };
 }
 
 async function fetchCalendarsEventsActions(ics_urls, cacheTimeout, httpProxy, FORWARD_DAYS) {

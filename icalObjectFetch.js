@@ -1,3 +1,8 @@
+/**
+ * Fetch iCal Object from *.ics URL
+ * Author: snomiao (snomiao@gmail.com)
+ * 2020-2021
+ */
 const nodeFetch = require('node-fetch');
 const httpsProxyAgent = require('https-proxy-agent');
 const sha256 = require('crypto-js/sha256');
@@ -18,7 +23,7 @@ exports.icalObjectFetch = icalObjectFetch;
 
 async function icsFileFetch(url, httpProxy) {
     // console.debug(`FETCHING ${url}`); 
-    return await nodeFetch(url, httpProxy && { agent: new httpsProxyAgent(httpProxy) } )
+    return await nodeFetch(url, httpProxy && { agent: new httpsProxyAgent(httpProxy) })
         .then(res => res.text())
         .catch(e => console.error(`Fetch error on URL: ${url} \nError details: ${e}\n\n Maybe you should check your network or you need a proxy to connect to google. `));
 }

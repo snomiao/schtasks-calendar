@@ -131,7 +131,7 @@ You can put *one* link (for now, support for multiple links in development) of t
 ## TODOS
 
 - [ ] Translate this into chinese version README.md
-- [ ] An wrapper CMD file.is needed to solving the error from `schtasks.exe` `ERROR: Value for '/TR' option cannot be more than 261 character(s).`
+- [x] An wrapper CMD file.is needed to solving the error from `schtasks.exe` `ERROR: Value for '/TR' option cannot be more than 261 character(s).`
 
 ## Q & A
 
