@@ -1,3 +1,12 @@
+## [2.2.4](https://github.com/snomiao/schcal/compare/v2.2.3...v2.2.4) (2021-04-10)
+
+
+### Bug Fixes
+
+* safe name with quote " ([aa6bc7d](https://github.com/snomiao/schcal/commit/aa6bc7d56ff1e69436d93a6483fb3bd00b2570d8))
+
+
+
 ## [2.2.3](https://github.com/snomiao/schcal/compare/v1.1.1...v2.2.3) (2021-04-06)
 
 
