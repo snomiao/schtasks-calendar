@@ -1,3 +1,7 @@
+## [2.2.7](https://github.com/snomiao/schcal/compare/v2.2.6...v2.2.7) (2021-04-13)
+
+
+
 ## [2.2.6](https://github.com/snomiao/schcal/compare/v2.2.5...v2.2.6) (2021-04-13)
 
 
