@@ -1,3 +1,12 @@
+## [2.2.6](https://github.com/snomiao/schcal/compare/v2.2.5...v2.2.6) (2021-04-13)
+
+
+### Bug Fixes
+
+* task name as title and proxy enviroment var ([c8d30a0](https://github.com/snomiao/schcal/commit/c8d30a079e1c21453340780ea405c6de9048021b))
+
+
+
 ## [2.2.5](https://github.com/snomiao/schcal/compare/v2.2.4...v2.2.5) (2021-04-13)
 
 
