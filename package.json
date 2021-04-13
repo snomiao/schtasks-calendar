@@ -18,8 +18,7 @@
         "build:patch": "npm version patch",
         "start": "npx .",
         "version": "conventional-changelog -p angular -i CHANGELOG.md -s && git add CHANGELOG.md",
-        "postversion": "git push --follow-tags",
-        "prepublishOnly": "npm run build"
+        "postversion": "git push --follow-tags"
     },
     "author": "snomiao@gmail.com",
     "repository": "git+https://github.com/snomiao/schcal.git",
