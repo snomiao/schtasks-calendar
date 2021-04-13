@@ -99,6 +99,7 @@ async function readConfig(argv) {
         ...configFromYAMLs,
         ...argv,
     };
+    process.env.HTTP_PROXY ||= config.HTTP_PROXY
     return config;
 }
 exports.readConfig = readConfig;
