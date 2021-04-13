@@ -1,3 +1,12 @@
+## [2.2.5](https://github.com/snomiao/schcal/compare/v2.2.4...v2.2.5) (2021-04-13)
+
+
+### Bug Fixes
+
+* match run command first ([013fd79](https://github.com/snomiao/schcal/commit/013fd79a5c21fd37d8503eedeab082be649cbb1a))
+
+
+
 ## [2.2.4](https://github.com/snomiao/schcal/compare/v2.2.3...v2.2.4) (2021-04-10)
 
 
