@@ -207,9 +207,9 @@ function getEventsActions(events) {
 }
 function getEventAction(event) {
     const { start, end, summary, description } = event;
-    const action = (
-        linkMatch(event) ||
-        runCommandMatch(event));
+    const action = null
+        || runCommandMatch(event)
+        || linkMatch(event)
     return action && {
         startDateString: start.toLocaleString(),
         endDateString: end.toLocaleString(),
@@ -230,8 +230,7 @@ function runCommandMatch(event) {
         || (summary?.match(/^RUN\s+(.*)/mi))
         || (description?.match(/^RUN\s+(.*)/mi))
     return matchedContent && (() => {
-        const [, command] = matchedContent;
-        return { commandOrURL: command };
+        return { commandOrURL: matchedContent[1] };
     })();
 }
 function linkMatch(event) {
