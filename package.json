@@ -8,9 +8,9 @@
         "calendar"
     ],
     "devDependencies": {
-        "@types/node": "^14.6.4",
         "@commitlint/cli": "^12.0.1",
         "@commitlint/config-conventional": "^12.0.1",
+        "@types/node": "^14.6.4",
         "conventional-changelog-cli": "^2.1.1",
         "husky": "^5.1.3"
     },
@@ -26,7 +26,6 @@
     "dependencies": {
         "crypto-js": "^4.0.0",
         "escape-filename": "^1.1.2",
-        "https-proxy-agent": "^5.0.0",
         "ical": "^0.8.0",
         "innertext": "^1.0.3",
         "is-url": "^1.2.4",
