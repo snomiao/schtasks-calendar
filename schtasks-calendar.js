@@ -204,19 +204,19 @@ function parseCalendarEventsActions(icalObject, FORWARD_DAYS) {
     }).filter(e => e).flat(1);
 }
 function getEventsActions(events) {
-    return events.map(getEventAction).filter(e => e);
+    return events.flatMap(getEventActions).filter(e => e);
 }
-function getEventAction(event) {
+function getEventActions(event) {
     const { start, end, summary, description } = event;
     const action = null
         || runCommandMatch(event)
         || linkMatch(event)
-    return action && {
+    return action && [{
         startDateString: start.toLocaleString(),
         endDateString: end.toLocaleString(),
         ...action,
         taskName: action.taskName || summary,
-    };
+    }]
 }
 
 function runCommandMatch(event) {
