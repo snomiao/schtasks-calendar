@@ -226,8 +226,8 @@ function runCommandMatch(event) {
     const summary = event?.summary
     //
     const matchedContent = null
-        || (summary?.match(/^启动\s+“([\s\S]*)”/mi))
-        || (description?.match(/^启动\s+“([\s\S]*)”/mi))
+        || (summary?.match(/^启动\s+([\s\S]*)/mi))
+        || (description?.match(/^启动\s+([\s\S]*)”/mi))
         || (summary?.match(/^RUN\s+(.*)/mi))
         || (description?.match(/^RUN\s+(.*)/mi))
     return matchedContent && (() => {
