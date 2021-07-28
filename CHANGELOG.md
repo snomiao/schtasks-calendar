@@ -1,3 +1,14 @@
+## [2.2.8](https://github.com/snomiao/schcal/compare/v2.2.7...v2.2.8) (2021-07-28)
+
+
+### Bug Fixes
+
+* improve error handleing ([e859523](https://github.com/snomiao/schcal/commit/e859523686b406fb48971afd86598e23ce5371cb))
+* 启动指令去引号 ([1f47424](https://github.com/snomiao/schcal/commit/1f47424f0eb20566dc3757d1106a55e7ee8f1a2f))
+* 启动指令去掉引号 ([59afc6f](https://github.com/snomiao/schcal/commit/59afc6f06eb141ebcd8537b569189b6777520d55))
+
+
+
 ## [2.2.7](https://github.com/snomiao/schcal/compare/v2.2.6...v2.2.7) (2021-04-13)
 
 
