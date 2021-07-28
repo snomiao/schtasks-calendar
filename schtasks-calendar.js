@@ -28,7 +28,8 @@ CSV.sep = ',';
 CSV.header = false;
 
 // RUN cli
-if (!module.parent) main().then(console.info).catch(console.error);
+if (!module.parent) main().then(console.info)
+// .catch(console.error);
 module.exports = main
 
 async function main() {
@@ -63,7 +64,10 @@ async function main() {
 async function importNewSchtasks(schtasksCreationObjects) {
     const schtasksCreationCommands = schtasksCreationObjects.map(({ schtasksCommand }) => schtasksCommand);
     const creactionErrors = await runSchtasksCommands(schtasksCreationCommands);
-    creactionErrors.length && console.error('creactionErrors: ', creactionErrors);
+    if (creactionErrors.length) {
+        console.error('creactionErrors: ', creactionErrors);
+        process.exit(1)
+    }
     console.log(`${schtasksCreationCommands.length} sch-tasks added.`);
 }
 exports.importNewSchtasks = importNewSchtasks;
@@ -75,7 +79,10 @@ async function cleanOldSchtasks(config) {
     const schtasksDeletionCommands = ssacTaskNames.map(taskName => `schtasks /Delete /tn ${getSafeCommandParamString(taskName)} /F`);
     // console.log(schtasksDeletionCommands)
     const deletionErrors = await runSchtasksCommands(schtasksDeletionCommands);
-    deletionErrors.length && console.error('deletionErrors: ', deletionErrors);
+    if (deletionErrors.length) {
+        console.error('deletionErrors: ', deletionErrors)
+        process.exit(1)
+    }
     console.log(`${schtasksDeletionCommands.length} old sch-tasks cleaned.`);
 }
 exports.cleanOldSchtasks = cleanOldSchtasks;
@@ -116,9 +123,10 @@ async function runSchtasksCommands(schtasksCommands) {
 
 async function generateSchtasksCreationObjects(config) {
     const { ICS_URLS, HTTP_PROXY, CACHE_TIMEOUT, FORWARD_DAYS, SSAC_PREFIX } = config;
-    console.assert(ICS_URLS?.length, 'CONFIG ERROR... ICS_URLS is empty, maybe you should write a config file or put a ics URL as a param...\nMore infomation can be found in https://github.com/snomiao/schtasks-calendar');
-    if (!ICS_URLS?.length)
+    if (!ICS_URLS?.length) {
+        console.error('CONFIG ERROR... ICS_URLS is empty, maybe you should write a config file or put a ics URL as a param...\nMore infomation can be found in https://github.com/snomiao/schtasks-calendar')
         process.exit(1);
+    }
     const actions = await fetchCalendarsEventsActions(ICS_URLS, CACHE_TIMEOUT, HTTP_PROXY, FORWARD_DAYS);
     return (await Promise.all(actions
         .map(async ({ taskName, startDateString, endDateString, commandOrURL }) => {

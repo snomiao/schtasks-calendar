@@ -8,4 +8,5 @@
 const main = require('./schtasks-calendar')
 
 // RUN cli
-if (require.main === module) main().then(console.info).catch(console.error);
+if (require.main === module) main().then(console.info)
+// .catch(console.error);
