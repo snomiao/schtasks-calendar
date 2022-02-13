@@ -1,3 +1,35 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# 2.3.0 (2022-02-13)
+
+
+### Features
+
+* import schcal and calendar and datas ([9cc4af8](https://github.com/snomiao/schcal/commit/9cc4af86dacd735c2c2c2ad695295dadee7004f6))
+
+
+
+
+
+# 2.3.0 (2022-02-13)
+
+
+### Bug Fixes
+
+* data-tidy ([0ad8ae2](https://github.com/snomiao/schcal/commit/0ad8ae2a9c2e967de9fb917262ef1e35628f144b))
+* manictime for xinhang and export ([6f60907](https://github.com/snomiao/schcal/commit/6f609077ca378278e4a110bad3271a095024a76e))
+* subtree-sync ([3253947](https://github.com/snomiao/schcal/commit/3253947a085b16aae34d0a0260d83f2ae1b3e56a))
+
+
+### Features
+
+* import schcal and calendar and datas ([9cc4af8](https://github.com/snomiao/schcal/commit/9cc4af86dacd735c2c2c2ad695295dadee7004f6))
+
+
+
 ## [2.2.8](https://github.com/snomiao/schcal/compare/v2.2.7...v2.2.8) (2021-07-28)
 
 
@@ -47,6 +79,3 @@
 
 * add CI ([a1c36f4](https://github.com/snomiao/schcal/commit/a1c36f4d912709023fb71123e90469150b6992ab))
 * fix: 'ERROR: Invalid Start Date (Date should be in "mm/dd/yyyy" format).\r\r\n' ([09693ae](https://github.com/snomiao/schcal/commit/09693aed77fcdd14c3da5ec3cb90acdf6a560966))
-
-
-
