@@ -7,13 +7,15 @@ Synchronizes (or clones) Google Calendar events containing a markdown link to Wi
 ### 1. Add events to Google Calendar (let's say, in the next few days).
 
 Type into the title field in the following format:
+
 - `[ ...taskname ]( ...link )`
 - `[ ...taskname ]( ...local_application_path )`
 
 Example:
+
 - `[ view schtasks-calendar ]( https://github.com/snomiao/schcal )`
 
-  ![]( images/view-schtasks-calendar.png)
+  ![](images/view-schtasks-calendar.png)
 
 ### 2. Then go to the settings for the particular calendar (in the hamburgur menu on the left), or go to `Settings for my calendars` section (in the main settings) for the particular calendar to be exported.
 
@@ -33,19 +35,20 @@ npx schcal YOUR_ICS_URL
 ```
 
 Example:
+
 ```sh
 npx schcal https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 ```
 
 You should see this
 
-![]( images/npx%20schcal.png )
+![](images/npx%20schcal.png)
 
 ### 4. Check your schtasks
 
 Press `Win + R` and type `taskschd.msc` to open Windows Task Scheduler
 
-![]( images/Windows%20Tasks%20Scheduler%20SSAC%20task.png )
+![](images/Windows%20Tasks%20Scheduler%20SSAC%20task.png)
 
 The task `SSAC-0820-0530-view schtasks-calendar-XXXXXX` corresponds to the event you just added to Google Calendar and the link contained will be opened on time.
 
@@ -55,14 +58,16 @@ If you want to keep using this, you can configure the auto update (daily or when
 
 1. Run `mkdir schcal` in command line to create a directory.
 2. Write the following to the config file
-`~/.schcal/config.yaml`
+   `~/.schcal/config.yaml`
+
 ```yaml
 ICS_URLS:
   - https://calendar.google.com/calendar/ical/xxxxxxxxxxxxxxxxxxx/private-cxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx/basic.ics
 ```
 
-3. Write the following to the batch file 
-`schcal/on-schtask.bat`
+3. Write the following to the batch file
+   `schcal/on-schtask.bat`
+
 ```bat
 cd %~dp0
 npx schcal > ./schcal.log
@@ -109,7 +114,7 @@ ICS_URLS:
 HTTP_PROXY: http://localhost:1080
 
 # Optional, how many days events will add to schtasks, default value is 7 (then this program will )
-FORWARD_DAYS: 7        # TODO: NEED TO DRAW A DIAGRAM TO EXPLAIN THIS
+FORWARD_DAYS: 7 # TODO: NEED TO DRAW A DIAGRAM TO EXPLAIN THIS
 ```
 
 and run
@@ -117,11 +122,13 @@ and run
 ```sh
 npx schcal
 ```
+
 in the working directory containing `config.yaml` .
 
 ## Supported formats
 
-You can put *one* link (for now, support for multiple links in development) of the following into the title or description fields of events to be launched as scheduled.
+You can put _one_ link (for now, support for multiple links in development) of the following into the title or description fields of events to be launched as scheduled.
+
 1. Web Links: `http://...` , `https://...` , `ftp://...` , `file://...`
 2. Markdown Links: `[ ... ]( ... )`
 3. Run Command: `RUN ...`
@@ -136,11 +143,11 @@ You can put *one* link (for now, support for multiple links in development) of t
 ## Q & A
 
 - Q: I saw "Unexpected token ." when using `npx schcal`.
-- A: You need to update your Nodejs to higher than v14.8.0  [Click to download](https://nodejs.org/en/download/)
+- A: You need to update your Nodejs to higher than v14.8.0 [Click to download](https://nodejs.org/en/download/)
 
 ## References and further readings
 
-- [schtasks | Microsoft Docs]( https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks )
-- [手把手教你使用nodejs编写cli(命令行) - 掘金]( https://juejin.im/post/6844903702453551111 )
-- [PC Automation - IFTTT]( https://ifttt.com/applets/190903p-pc-automation )
-
+- [schtasks | Microsoft Docs](https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks)
+- [手把手教你使用 nodejs 编写 cli(命令行) - 掘金](https://juejin.im/post/6844903702453551111)
+- [PC Automation - IFTTT](https://ifttt.com/applets/190903p-pc-automation)
+- [Monkai - Your Digital Wellbeing Assistant](https://monkai.io/)
