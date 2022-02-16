@@ -1,0 +1,5 @@
+*.log
+config.yaml
+node_modules
+cache*
+publish.bat
