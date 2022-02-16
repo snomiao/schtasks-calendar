@@ -1,0 +1,102 @@
+2017-01-01 open Assets:BankBoC:C1234 CNY ; 学校银行卡
+1990-01-01 open Assets:BitCard:2962 CNY
+1990-01-01 open Liabilities:CreditCard:2962 CNY, USD
+1990-01-01 open Income:Salary CNY
+1990-01-01 open Expenses:Tax CNY
+1990-01-01 open Expenses:Traffic:Taxi CNY
+1990-01-01 open Expenses:Digital CNY
+2022-01-24 open Expenses:Food CNY
+1990-01-01 open Equity:OpenBalance
+
+
+2021-10-01 open Liabilities:JD:JD CNY
+
+2021-10-30 * "京东 订单号： 229056039452" "微软surface pen笔尖原装触控笔Pro7手写笔go超细头替换笔头电池触屏笔平板绘画笔通用配件 原装笔尖包【4/5代通用】4支（HB）"
+  date: "2021-10-30 01:52:15"
+  Expenses:Food:Other   64.00 CNY
+  Liabilities:JD:JD
+
+2021-10-30 * "京东 订单号： 231222231008" "京东京造 泡沫轴肌肉放松健身按摩滚轮瑜伽棒滚轴筋膜球瑜伽柱三件套"
+  date: "2021-10-30 00:57:42"
+  Expenses:Food:Other   64.00 CNY
+  Liabilities:JD:JD
+
+2021-10-27 * "京东 订单号： 228967576468" "志高 台式多功能打蛋器电动家用厨师机奶油和面机打发鲜奶盖揉面机4L搅拌机商用黑色 烘焙标准套餐"
+  date: "2021-10-27 21:55:38"
+  Expenses:Food:Other  298.00 CNY
+  Liabilities:JD:JD
+
+2021-10-26 * "京东 订单号： 228888992663" "麦克赛尔(Maxell)1号电池碳性大号干电池蓝锰2节装 热水器煤气灶燃气灶手电筒儿童玩具"
+  date: "2021-10-26 13:30:41"
+  Expenses:Food:Other    6.18 CNY
+  Liabilities:JD:JD
+
+2021-10-24 * "京东 订单号： 231037530249" "万通筋骨贴祛风活血运动腰肌劳损膏贴颈肩腿痛贴1盒10贴"
+  date: "2021-10-24 18:43:42"
+  Expenses:Food:Other   25.00 CNY
+  Liabilities:JD:JD
+
+2021-10-24 * "京东 订单号： 231027263394" "Keep TPE健身垫瑜伽垫183*80cm防滑加长运动垫男女加厚7mm厚 灰色【易烊千玺同款】 等"
+  date: 2021-10-24 18:43:42
+  Expenses:Food:Other  188.00 CNY
+  Liabilities:JD:JD
+
+2021-10-23 * "京东 订单号： 230991636840" "德国欧莱德手电钻电动螺丝刀充电式电起子双速12v锂电钻家用手钻电动工具充电电钻五金工具箱套装电动工具 至尊星耀12V双速电钻双电池加钻头工具箱"
+  date: "2021-10-23 22:03:04"
+  Expenses:Food:Other   89.00 CNY
+  Liabilities:JD:JD
+
+2021-10-23 * "京东 订单号： 230989695530" "EZCast千兆USB无线网卡5G双频电脑多功能笔记本台式机通用随身wifi接收器蓝牙适配器5.0 5300E"
+  date: "2021-10-23 22:03:04"
+  Expenses:Digital      89.00 CNY
+  Liabilities:JD:JD
+
+2021-10-23 * "京东 订单号： 230988838923" "GP超霸1号电池13G-BJ2碳性一号大号大码1.5V煤气燃气灶热水器D型干电池R20S绿超霸1号 2粒"
+  date: "2021-10-23 22:03:04"
+  Expenses:Food:Other    7.61 CNY
+  Liabilities:JD:JD
+
+2021-10-18 * "京东 订单号： 228677958534" "ThinkPad（联想） 双模键盘蓝牙无线键盘 USB小红点键盘 充电版手机平板键盘 无线蓝牙双模键"
+  date: "2021-10-18 18:02:54"
+  Expenses:Digital     599.00 CNY
+  Liabilities:JD:JD
+
+2021-10-18 * "京东 订单号： 228668077728" "维达(Vinda) 抽纸 超韧3层130抽*24包软抽 纸巾(真S码) 整箱销售 湿水不易破 母婴可用 抽取式面巾纸"
+  date: "2021-10-18 18:02:54"
+  Expenses:Food:Other   57.90 CNY
+  Liabilities:JD:JD
+
+2021-10-18 * "京东 订单号： 228664994115" "佳佰【京东自有品牌】抗菌小麦砧板防霉环保可降解稻壳塑料切菜板【380*290*9mm】"
+  date: "2021-10-18 18:02:54"
+  Expenses:Food:Other   31.96 CNY
+  Liabilities:JD:JD
+
+2021-10-18 * "京东 订单号： 228610313614" "【自营同款】小米米家智能电压力锅2.5L家用迷你多功能电饭煲电压力锅焖炖煲煮一机多能智能电炖锅高压锅 米家智能电压力锅2.5L"
+  date: "2021-10-18 18:02:54"
+  Expenses:Digital     263.00 CNY
+  Liabilities:JD:JD
+
+2021-10-14 * "京东 订单号： 225945545438" "美厨（maxcook）304不锈钢网漏漏勺 油漏豆浆过滤网勺油炸网勺撇沫勺面粉筛捞漏勺14CM MCCU769 等"
+  date: 2021-10-14 16:17:23
+  Expenses:Food:Other   52.43 CNY
+  Liabilities:JD:JD
+
+2021-10-14 * "京东 订单号： 225531780389" "雀巢( Nestle) 烘焙原料 淡奶油 常温存储 易打发 蛋糕裱花 冰淇淋蛋挞鲜奶油 稀奶油 250ml"
+  date: "2021-10-14 01:02:40"
+  Expenses:Food:Other   15.90 CNY
+  Liabilities:JD:JD
+
+2021-10-14 * "京东 订单号： 225531016614" "烤乐仕蛋糕模具套装烘焙工具土司模具饼干模具披萨盘烤盘烤箱早古蛋糕模具烘培工具面包月饼模具烘焙 蛋糕模具8件套"
+  date: "2021-10-14 01:02:40"
+  Expenses:Food:Snack   59.90 CNY
+  Liabilities:JD:JD
+
+2021-10-14 * "京东 订单号： 225531016582" "lifefun/立丰 中华老字号儿童休闲零食代餐三明治下饭菜 芝麻海苔肉松肉酥 150g"
+  date: "2021-10-14 01:02:40"
+  Expenses:Food:Other   21.80 CNY
+  Liabilities:JD:JD
+
+2021-10-14 * "京东 订单号： 225528772649" "妙可蓝多 马苏里拉芝士碎450g（奶酪碎 披萨拉丝奶酪 焗饭 烘焙材料）"
+  date: "2021-10-14 01:02:40"
+  Expenses:Food:Other   23.80 CNY
+  Liabilities:JD:JD
