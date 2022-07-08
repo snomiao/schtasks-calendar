@@ -2,6 +2,8 @@
 
 Synchronizes (or clones) Google Calendar events containing a markdown link to Windows Task Scheduler to automatically open the link on time on your PC.
 
+ARCHIVED: This repo has moved into part of [snomiao/js](https://github.com/snomiao/js)
+
 ## Get Started
 
 ### 1. Add events to Google Calendar (let's say, in the next few days).
