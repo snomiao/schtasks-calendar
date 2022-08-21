@@ -1,4 +1,4 @@
-# schtasks-calendar (or schcal)
+# SchTasks-Calendar (or schcal)
 
 Synchronizes (or clones) Google Calendar events containing a markdown link to Windows Task Scheduler to automatically open the link on time on your PC.
 
