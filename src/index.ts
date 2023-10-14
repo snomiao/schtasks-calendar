@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import { exec } from "child_process";
 import { csvParseRows } from "d3";
 import { existsSync } from "fs";
