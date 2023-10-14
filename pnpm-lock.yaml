@@ -7,6 +7,9 @@ dependencies:
   sanitize-filename-truncate:
     specifier: ^1.0.2
     version: 1.0.2
+  tunnel:
+    specifier: ^0.0.6
+    version: 0.0.6
 
 devDependencies:
   '@types/d3':
@@ -57,9 +60,6 @@ devDependencies:
   tsx:
     specifier: 3.10.1
     version: 3.10.1
-  tunnel:
-    specifier: ^0.0.6
-    version: 0.0.6
   vitest:
     specifier: ^0.24.5
     version: 0.24.5
@@ -3145,7 +3145,7 @@ packages:
   /tunnel@0.0.6:
     resolution: {integrity: sha512-1h/Lnq9yajKY2PEbBadPXj3VxsDDu844OnaAo52UVmIzIvwwtBPIuNvkjuzBlTWpfJyUbG3ez0KSBibQkj4ojg==}
     engines: {node: '>=0.6.11 <=0.7.0 || >=0.7.3'}
-    dev: true
+    dev: false
 
   /type-detect@4.0.8:
     resolution: {integrity: sha512-0fr/mIH1dlO+x7TlcMy+bIDqKPsw/70tVyeHW787goQjhmqaZe10uwLujubK9q9Lg6Fiho1KUKDYz0Z7k7g5/g==}
