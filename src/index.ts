@@ -5,7 +5,6 @@ import { readFile } from "fs/promises";
 import { CalendarComponent } from "ical";
 import sanitize from "sanitize-filename-truncate";
 import sha1 from "sha1";
-import { snof } from "snofa";
 import snorun from "snorun";
 import { promisify } from "util";
 import yaml from "yaml";
@@ -13,10 +12,12 @@ import commandWrapperFileCreate from "./commandWrapperFileCreate";
 import icalObjectFetch from "./icalObjectFetch";
 
 export async function newSchtasksImport(
-  schtasksCreationObjects: Awaited<ReturnType<typeof generateSchtasksCreationObjects>>,
+  schtasksCreationObjects: Awaited<
+    ReturnType<typeof generateSchtasksCreationObjects>
+  >
 ) {
   const schtasksCreationCommands = schtasksCreationObjects.map(
-    ({ schtasksCommand }) => schtasksCommand,
+    ({ schtasksCommand }) => schtasksCommand
   );
   const creactionErrors = await runSchtasksCommands(schtasksCreationCommands);
   if (creactionErrors.length) {
@@ -26,15 +27,20 @@ export async function newSchtasksImport(
   console.log(`${schtasksCreationCommands.length} sch-tasks added.`);
 }
 
-export async function outdatedSchtasksClean(config: Awaited<ReturnType<typeof readConfig>>) {
+export async function outdatedSchtasksClean(
+  config: Awaited<ReturnType<typeof readConfig>>
+) {
   // await exec('chcp 65001'); // run below command in utf8 encoding
-  const csv = csvParseRows(await snorun("schtasks /query /fo csv /nh", { pipe: false }).stdout);
+  const csv = csvParseRows(
+    await snorun("schtasks /query /fo csv /nh", { pipe: false }).stdout
+  );
   const ssacTaskNames = csv
     .map(([taskPath]) => taskPath.slice(1))
     .filter((e) => e)
     .filter((e) => e.startsWith(config.SSAC_PREFIX));
   const schtasksDeletionCommands = ssacTaskNames.map(
-    (taskName) => `schtasks /Delete /tn ${getSafeCommandParamString(taskName)} /F`,
+    (taskName) =>
+      `schtasks /Delete /tn ${getSafeCommandParamString(taskName)} /F`
   );
   // console.log(schtasksDeletionCommands)
   const deletionErrors = await runSchtasksCommands(schtasksDeletionCommands);
@@ -53,16 +59,24 @@ export async function readConfig(argv: {
   ICS_URLS: string | string[];
   _: (number | string)[];
 }) {
+  const possibleConfigPathes = [
+    argv.config,
+    process.env.CONFIG,
+    "config.yaml",
+    `${process.env.APPDATA}/schcal/config.yaml`,
+    `${process.env.USERPROFILE}/.schcal/config.yaml`,
+  ];
   const configYAMLs = await Promise.all(
-    [
-      argv.config,
-      process.env.CONFIG,
-      "config.yaml",
-      `${process.env.USERPROFILE}/.schcal/config.yaml`,
-    ]
+    possibleConfigPathes
+      .flatMap((e) => (e ? [e] : [])) // filter by boolean
       .reverse()
-      .filter(existsSync)
-      .map(async (configPath) => yaml.parse(await readFile(configPath, "utf-8"))),
+      .map(async (configPath) => {
+        try {
+          return yaml.parse(await readFile(configPath, "utf-8"));
+        } catch (e) {
+          return {};
+        }
+      })
   );
   const y = configYAMLs.reduce((a, b) => ({ ...a, ...b }), {});
   const config = {
@@ -73,7 +87,9 @@ export async function readConfig(argv: {
     // ...process.env,
     // ...configFromYAMLs,
     // ...argv,
-    ICS_URLS: [y.ICS_URLS, argv.ICS_URLS, argv._?.map(String)].flat().filter((e) => e),
+    ICS_URLS: [y.ICS_URLS, argv.ICS_URLS, argv._?.map(String)]
+      .flat()
+      .filter((e) => e),
   };
   process.env.HTTP_PROXY ||= config.HTTP_PROXY;
   return config;
@@ -85,7 +101,7 @@ async function runSchtasksCommands(schtasksCommands: string[]) {
     schtasksCommands.map(async (schtasksCommand) => ({
       schtasksCommand,
       ...(await promisify(exec)(schtasksCommand)),
-    })),
+    }))
   );
   const outputsWithStderr = exec_outputs.filter(({ stderr }) => stderr);
   // console.log('errors', outputsWithStderr)
@@ -106,25 +122,35 @@ export async function generateSchtasksCreationObjects({
     console.error(
       "CONFIG ERROR... ICS_URLS is empty, " +
         "maybe you should write a config file or put a ics URL as a param...\n" +
-        "More infomation can be found in https://github.com/snomiao/schtasks-calendar",
+        "More infomation can be found in https://github.com/snomiao/schtasks-calendar"
     );
     process.exit(1);
   }
   const actions = await fetchCalendarsEventsActions(ICS_URLS, FORWARD_DAYS);
   return (
     await Promise.all(
-      actions.map(async ({ taskName, startDateString, endDateString, commandOrURL }) => {
-        // console.log({ startDateString, endDateString, commandOrURL });
-        const schtasksObject = await getSchtasksObject(
-          taskName,
-          startDateString,
-          endDateString,
-          commandOrURL,
-          SSAC_PREFIX,
-        );
-        // console.log(schtasksObject);
-        return schtasksObject;
-      }),
+      actions
+        .flatMap((e) => (e ? [e] : []))
+        .map(
+          async ({
+            taskName,
+            startDateString,
+            endDateString,
+            commandOrURL,
+          }) => {
+            // console.log({ startDateString, endDateString, commandOrURL });
+            if (!taskName) throw new Error("taskName is empty");
+            const schtasksObject = await getSchtasksObject(
+              taskName,
+              startDateString,
+              endDateString,
+              commandOrURL,
+              SSAC_PREFIX
+            );
+            // console.log(schtasksObject);
+            return schtasksObject;
+          }
+        )
     )
   )
     .sort((a, b) => a.schtasksName.localeCompare(b.schtasksName))
@@ -138,7 +164,7 @@ async function getSchtasksObject(
   startDateString: string,
   endDateString: string,
   commandOrURL: string,
-  SSAC_PREFIX: string,
+  SSAC_PREFIX: string
 ) {
   const S = DateTimeAssembly(new Date(startDateString));
   const E = DateTimeAssembly(new Date(endDateString));
@@ -151,7 +177,7 @@ async function getSchtasksObject(
   // [schtasks | Microsoft Docs]( https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks )
   const taskStartDate = new Date(startDateString);
   const taskStartDateShortString = new Date(
-    +new Date(startDateString) - new Date().getTimezoneOffset() * 60e3,
+    +new Date(startDateString) - new Date().getTimezoneOffset() * 60e3
   )
     .toISOString()
     .replace(/[^\dT]/g, "")
@@ -168,10 +194,13 @@ async function getSchtasksObject(
   // const slientlyRunCommand = (slientlyRunCommandRaw.length <= 250) ? slientlyRunCommandRaw : await mkCommandWrapperFile(taskHash, slientlyRunCommandRaw)
   //
   // 全部使用wrapper
-  const slientlyRunCommand = await commandWrapperFileCreate(taskHash, commandOrURL);
+  const slientlyRunCommand = await commandWrapperFileCreate(
+    taskHash,
+    commandOrURL
+  );
   //
   const safeTaskname = getSafeCommandParamString(
-    sanitize(schtasksName.slice(0, 200)).replace(/[<>\/\\:~%"']/g, "-"),
+    sanitize(schtasksName.slice(0, 200)).replace(/[<>\/\\:~%"']/g, "-")
   );
   const safeTR = getSafeCommandParamString(slientlyRunCommand);
   const taskParams = `/TN ${safeTaskname} /TR ${safeTR}`;
@@ -187,95 +216,49 @@ function getSafeCommandParamString(串: string) {
   return `"${串.replace(/"/g, '\\"')}"`;
 }
 function DateTimeAssembly(date: Date) {
-  const [, 年, 月, 日, 时, 分, 秒, 毫秒] = new Date(+date - new Date().getTimezoneOffset() * 60e3)
+  const dateInfo = new Date(+date - new Date().getTimezoneOffset() * 60e3)
     .toISOString()
     .match(/(....)-(..)-(..)T(..):(..):(..)\.(...)Z/);
+  if (!dateInfo) throw Object.assign(new Error("Fail to get date"), { date });
+  const [, YYYY, MM, DD, hh, mm, ss, ms] = dateInfo;
 
   return {
     D_Locale: date.toLocaleDateString(),
     T_Locale: date.toLocaleTimeString(),
-    D: [年, 月, 日].join("/"),
-    T: [时, 分, 秒].join(":"),
+    D: [YYYY, MM, DD].join("/"),
+    T: [hh, mm, ss].join(":"),
   };
 }
 
-async function fetchCalendarsEventsActions(ics_urls: string[], FORWARD_DAYS: number) {
+async function fetchCalendarsEventsActions(
+  ics_urls: string[],
+  FORWARD_DAYS: number
+) {
   return (
     await Promise.all(
-      ics_urls.map(async (ics_url) => await fetchCalendarEventsActions(ics_url, FORWARD_DAYS)),
+      ics_urls.map(
+        async (ics_url) =>
+          await fetchCalendarEventsActions(ics_url, FORWARD_DAYS)
+      )
     )
   ).flat(1);
 }
 
-async function fetchCalendarEventsActions(ics_url: string, FORWARD_DAYS: number) {
+async function fetchCalendarEventsActions(
+  ics_url: string,
+  FORWARD_DAYS: number
+) {
   const icalObject = await icalObjectFetch(ics_url);
   const actions = Object.values(icalObject)
     .map((vEvent) => {
       if (vEvent.type !== "VEVENT") return;
       // vEvent
-      const [rangeStart, rangeEnd] = [+new Date(), +new Date() + FORWARD_DAYS * 86400e3]; // FORWARD_DAYS days from now
+      const [rangeStart, rangeEnd] = [
+        +new Date(),
+        +new Date() + FORWARD_DAYS * 86400e3,
+      ]; // FORWARD_DAYS days from now
       const events = getRangeEvents(vEvent, rangeStart, rangeEnd);
-      const actions = snof(events, function getEventsActions(events) {
-        return events
-          .flatMap(function getEventActions(event) {
-            const { start, end, summary, description } = event;
-            const action =
-              null ||
-              snof(event, function runCommandMatch(event) {
-                // BEWARE the description can be plain text OR HTML but what we just want want a plain text.
-                const description = innerText(event?.description || ""); // ASSUME THE HTML IS GOOD AT FORMAT
-                // description.match('share') && console.debug(description);
-                const summary = event?.summary;
-                //
-                const matchedContent =
-                  null ||
-                  summary?.match(/^启动\s+([\s\S]*)/im) ||
-                  description?.match(/^启动\s+([\s\S]*)/im) ||
-                  summary?.match(/^RUN\s+(.*)/im) ||
-                  description?.match(/^RUN\s+(.*)/im);
-                return (
-                  matchedContent &&
-                  (() => {
-                    return { commandOrURL: matchedContent[1], taskName: "" };
-                  })()
-                );
-              }) ||
-              snof(event, function linkMatch(event) {
-                // BEWARE the description can be plain text OR HTML but what we just want want a plain text.
-                const description = innerText(event?.description || ""); // ASSUME THE HTML IS GOOD AT FORMAT
-                const summary = event?.summary;
-                // markdown style
-                const matchedContent =
-                  summary?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/) ||
-                  description?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/) ||
-                  summary?.match(
-                    /(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/,
-                  ) ||
-                  description?.match(
-                    /(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/,
-                  );
-
-                return (
-                  matchedContent &&
-                  (() => {
-                    const [, 标题, 链接] = matchedContent;
-                    return { commandOrURL: 链接, taskName: 标题 };
-                  })()
-                );
-              });
-            return (
-              action && [
-                {
-                  startDateString: start.toLocaleString(),
-                  endDateString: end.toLocaleString(),
-                  ...action,
-                  taskName: action.taskName || summary,
-                },
-              ]
-            );
-          })
-          .filter((e) => e);
-      });
+      const actions = getEventsActions(events);
       return actions;
     })
     .filter((e) => e)
@@ -283,20 +266,87 @@ async function fetchCalendarEventsActions(ics_url: string, FORWARD_DAYS: number)
   return actions;
 }
 
+function getEventsActions(events: any) {
+  return events
+    .flatMap(function getEventActions(event) {
+      const { start, end, summary, description } = event;
+      const action = null || runCommandMatch(event) || linkActionMatch(event);
+      return (
+        action && [
+          {
+            startDateString: start.toLocaleString(),
+            endDateString: end.toLocaleString(),
+            ...action,
+            taskName: action.taskName || summary,
+          },
+        ]
+      );
+    })
+    .filter((e) => e);
+}
+
+function linkActionMatch(event: any) {
+  const description = innerText(event?.description || ""); // ASSUME THE HTML IS GOOD AT FORMAT
+  const summary = event?.summary;
+  // markdown style
+  const matchedContent =
+    summary?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/) ||
+    description?.match(/\[\s*(.*?)\s*?\]\(\s*(.*?)\s*?\)/) ||
+    summary?.match(
+      /(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/
+    ) ||
+    description?.match(
+      /(.*)((?:https?|ftp|file):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/
+    );
+
+  return (
+    matchedContent &&
+    (() => {
+      const [, 标题, 链接] = matchedContent;
+      return { commandOrURL: 链接, taskName: 标题 };
+    })()
+  );
+}
+
+function runCommandMatch(event: any) {
+  // BEWARE the description can be plain text OR HTML but what we just want want a plain text.
+  const description = innerText(event?.description || ""); // ASSUME THE HTML IS GOOD AT FORMAT
+
+  // description.match('share') && console.debug(description);
+  const summary = event?.summary;
+  //
+  const matchedContent =
+    null ||
+    summary?.match(/^启动\s+([\s\S]*)/im) ||
+    description?.match(/^启动\s+([\s\S]*)/im) ||
+    summary?.match(/^RUN\s+(.*)/im) ||
+    description?.match(/^RUN\s+(.*)/im);
+  return (
+    matchedContent &&
+    (() => {
+      return { commandOrURL: matchedContent[1], taskName: "" };
+    })()
+  );
+}
+
 function getRangeEvents(
   vEvent: CalendarComponent,
   rangeStart: number | Date,
-  rangeEnd: number | Date,
+  rangeEnd: number | Date
 ) {
-  const { summary, description, start, end, rrule, recurrences, exdate } = vEvent;
+  const { summary, description, start, end, rrule, recurrences, exdate } =
+    vEvent;
+  if (!end || !start) throw new Error("missing start or end in event");
   // Calculate the duration of the event for use with recurring 事件.
   const duration = +end - +start;
   // avoid error
   // const _recurrences = recurrences || [];
   // const _exdate = exdate || [];
   // exdate == [ '2020-03-05': 2020-03-05T09:30:00.000Z { tz: 'Asia/Hong_Kong' } ]
+  if (!exdate) throw new Error("missing exdate in event");
   const exdatesKeys = Object.keys(exdate); // datestr or undefined
   // exdatesKeys == [ '2020-03-05' ]
+  if (!recurrences) throw new Error("missing recurrences in event");
   const recurrencesKeys = Object.keys(recurrences?.map((e) => e.exdate)); // datestr or undefined
   // recurrencesKeys == [ '2020-03-05' ]
   //
@@ -308,7 +358,9 @@ function getRangeEvents(
     // exlude dates
     .filter((date) => !exdatesKeys.includes(date.toISOString().slice(0, 10)))
     // override recurrences
-    .filter((date) => !recurrencesKeys.includes(date.toISOString().slice(0, 10)));
+    .filter(
+      (date) => !recurrencesKeys.includes(date.toISOString().slice(0, 10))
+    );
   // TODO: fix this
   // .concat(Object.values(_recurrences).map(({ start }) => start));
   // summary == '背词' && console.debug('dates', dates);
@@ -326,7 +378,10 @@ function getRangeEvents(
       })
       .filter((e) => e)
       // Filter the dates...
-      .filter(({ start, end }) => +rangeStart < +end && +rangeStart < +start && +start < +rangeEnd)
+      .filter(
+        ({ start, end }) =>
+          +rangeStart < +end && +rangeStart < +start && +start < +rangeEnd
+      )
   );
 }
 
