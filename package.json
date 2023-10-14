@@ -1,6 +1,6 @@
 {
   "name": "schcal",
-  "version": "2.4.239",
+  "version": "0.0.0",
   "description": "schtasks-calendar auto add events to windows schtasks from google calendar",
   "keywords": [
     "schtasks",
@@ -33,14 +33,14 @@
   "scripts": {
     "build": "npx snobuild",
     "prepack": "npm run build",
+    "semantic-release": "semantic-release",
     "start": "tsx src/cli.ts",
-    "test": "vitest run",
-    "semantic-release": "semantic-release"
+    "test": "vitest run"
   },
   "dependencies": {
     "ical": "^0.8.0",
     "sanitize-filename-truncate": "^1.0.2",
-    "tunnel": "^0.0.6",
+    "tunnel": "^0.0.6"
   },
   "devDependencies": {
     "@types/d3": "^7.4.1",
