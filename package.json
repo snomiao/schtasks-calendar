@@ -29,7 +29,8 @@
     "build": "npx snobuild",
     "prepack": "npm run build",
     "start": "tsx src/cli.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "ical": "^0.8.0",
@@ -46,6 +47,7 @@
     "dotenv": "16.0.3",
     "escape-filename": "^1.1.2",
     "node-fetch": "^3.3.2",
+    "semantic-release": "^22.0.5",
     "sha1": "^1.1.1",
     "snobuild": "^3.5.0",
     "snofa": "0.5.1",
