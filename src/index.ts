@@ -345,10 +345,9 @@ function getRangeEvents(
   // const _exdate = exdate || [];
   // exdate == [ '2020-03-05': 2020-03-05T09:30:00.000Z { tz: 'Asia/Hong_Kong' } ]
   // if (!exdate) throw new Error("missing exdate in event " + summary);
-  const exdatesKeys = !exdate ? [] : Object.keys(exdate); // datestr or undefined
+  const exdatesKeys = Object.keys(exdate ?? {}); // datestr or undefined
   // exdatesKeys == [ '2020-03-05' ]
-  if (!recurrences) throw new Error("missing recurrences in event " + summary);
-  const recurrencesKeys = Object.keys(recurrences?.map((e) => e.exdate)); // datestr or undefined
+  const recurrencesKeys = Object.keys(recurrences?.map((e) => e.exdate) ?? {}); // datestr or undefined
   // recurrencesKeys == [ '2020-03-05' ]
   //
   // First determine a fuzzy range date here,
