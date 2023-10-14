@@ -47,6 +47,7 @@
     "escape-filename": "^1.1.2",
     "node-fetch": "^3.3.2",
     "sha1": "^1.1.1",
+    "snobuild": "^3.5.0",
     "snofa": "0.5.1",
     "snorun": "^1.1.17",
     "tsx": "3.10.1",

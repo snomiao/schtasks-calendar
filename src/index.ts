@@ -1,6 +1,5 @@
 import { exec } from "child_process";
 import { csvParseRows } from "d3";
-import { existsSync } from "fs";
 import { readFile } from "fs/promises";
 import { CalendarComponent } from "ical";
 import sanitize from "sanitize-filename-truncate";
