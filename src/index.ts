@@ -335,17 +335,19 @@ function getRangeEvents(
 ) {
   const { summary, description, start, end, rrule, recurrences, exdate } =
     vEvent;
-  if (!end || !start) throw new Error("missing start or end in event");
+  if (!summary) throw new Error("missing summary in event");
+  if (!end || !start)
+    throw new Error("missing start or end in event " + summary);
   // Calculate the duration of the event for use with recurring 事件.
   const duration = +end - +start;
   // avoid error
   // const _recurrences = recurrences || [];
   // const _exdate = exdate || [];
   // exdate == [ '2020-03-05': 2020-03-05T09:30:00.000Z { tz: 'Asia/Hong_Kong' } ]
-  if (!exdate) throw new Error("missing exdate in event");
+  if (!exdate) throw new Error("missing exdate in event " + summary);
   const exdatesKeys = Object.keys(exdate); // datestr or undefined
   // exdatesKeys == [ '2020-03-05' ]
-  if (!recurrences) throw new Error("missing recurrences in event");
+  if (!recurrences) throw new Error("missing recurrences in event " + summary);
   const recurrencesKeys = Object.keys(recurrences?.map((e) => e.exdate)); // datestr or undefined
   // recurrencesKeys == [ '2020-03-05' ]
   //
