@@ -10,7 +10,10 @@
   "bugs": {
     "url": "https://github.com/snomiao/schcal/issues?q=is%3Aissue+is%3Aopen+schcal"
   },
-  "repository": "https://github.com/snomiao/schcal",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snomiao/schcal.git"
+  },
   "license": "MIT",
   "author": "Snowstar Miao <snomiao@gmail.com>",
   "type": "module",
@@ -21,7 +24,9 @@
   "main": "dist/index.min.cjs",
   "module": "dist/index.min.mjs",
   "types": "dist/index.d.ts",
-  "bin": "dist/cli.mjs",
+  "bin": {
+    "schcal": "dist/cli.mjs"
+  },
   "files": [
     "dist"
   ],
