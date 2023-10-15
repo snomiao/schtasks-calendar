@@ -30,4 +30,4 @@ jobs:
           GIT_AUTHOR_EMAIL: 'snomiao@gmail.com'
           GIT_COMMITTER_NAME: 'snomiao'
           GIT_COMMITTER_EMAIL: 'snomiao@gmail.com'
-        run: pnpm semantic-release
+        run: npx semantic-release

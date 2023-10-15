@@ -33,7 +33,6 @@
   "scripts": {
     "build": "npx snobuild",
     "prepack": "npm run build",
-    "semantic-release": "semantic-release",
     "start": "tsx src/cli.ts",
     "test": "vitest run"
   },
