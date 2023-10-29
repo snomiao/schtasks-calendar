@@ -51,9 +51,9 @@ export async function outdatedSchtasksClean(
 }
 
 export async function readConfig(argv: {
-  config: string;
+  config?: string;
   CACHE_TIMEOUT: number;
-  HTTP_PROXY: string;
+  HTTP_PROXY?: string;
   FORWARD_DAYS: number;
   ICS_URLS: string | string[];
   _: (number | string)[];
@@ -64,7 +64,7 @@ export async function readConfig(argv: {
     "config.yaml",
     `${process.env.APPDATA}/schcal/config.yaml`,
     `${process.env.USERPROFILE}/.schcal/config.yaml`,
-  ];
+  ].flatMap((e)=>e?[e]:[]);
   const configYAMLs = await Promise.all(
     possibleConfigPathes
       .flatMap((e) => (e ? [e] : [])) // filter by boolean
@@ -335,7 +335,7 @@ function getRangeEvents(
 ) {
   const { summary, description, start, end, rrule, recurrences, exdate } =
     vEvent;
-  if (!summary) throw new Error("missing summary in event");
+  if (!summary) throw new Error("missing summary in event with desc: "+ description);
   if (!end || !start)
     throw new Error("missing start or end in event " + summary);
   // Calculate the duration of the event for use with recurring 事件.
