@@ -335,7 +335,7 @@ function getRangeEvents(
 ) {
   const { summary, description, start, end, rrule, recurrences, exdate } =
     vEvent;
-  if (!summary) throw new Error("missing summary in event with desc: "+ description);
+  // if (!summary) throw new Error("missing summary in event with desc: "+ description);
   if (!end || !start)
     throw new Error("missing start or end in event " + summary);
   // Calculate the duration of the event for use with recurring 事件.
