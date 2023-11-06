@@ -64,7 +64,7 @@ export async function readConfig(argv: {
     "config.yaml",
     `${process.env.APPDATA}/schcal/config.yaml`,
     `${process.env.USERPROFILE}/.schcal/config.yaml`,
-  ].flatMap((e)=>e?[e]:[]);
+  ].flatMap((e) => (e ? [e] : []));
   const configYAMLs = await Promise.all(
     possibleConfigPathes
       .flatMap((e) => (e ? [e] : [])) // filter by boolean
@@ -125,7 +125,10 @@ export async function generateSchtasksCreationObjects({
     );
     process.exit(1);
   }
-  const actions = await fetchCalendarsEventsActions(ICS_URLS, FORWARD_DAYS);
+  console.log("fetching...");
+  const actions = await fetchCalendarsEventsActions( ICS_URLS, FORWARD_DAYS);
+
+  console.log("parsing...");
   return (
     await Promise.all(
       actions
@@ -222,9 +225,15 @@ function DateTimeAssembly(date: Date) {
   const [, YYYY, MM, DD, hh, mm, ss, ms] = dateInfo;
 
   return {
-    D_Locale: date.toLocaleDateString(),
-    T_Locale: date.toLocaleTimeString(),
-    D: [YYYY, MM, DD].join("/"),
+    D: JSON.stringify(
+      date
+        .toLocaleDateString()
+        .replace(/\/(\d)\//g, (_, n: string) => "/" + n.padStart(2, "0") + "/")
+    ),
+    // T: JSON.stringify(
+    //   date.toLocaleTimeString()
+    // ),
+    // D: [YYYY, MM, DD].join("/"),
     T: [hh, mm, ss].join(":"),
   };
 }
@@ -336,10 +345,16 @@ function getRangeEvents(
   const { summary, description, start, end, rrule, recurrences, exdate } =
     vEvent;
   // if (!summary) throw new Error("missing summary in event with desc: "+ description);
-  if (!end || !start)
-    throw new Error("missing start or end in event " + summary);
+  if (!start) {
+    throw new Error("missing start in event " + summary);
+  }
+  const end2 = end ?? new Date(+start + 3600e3 / 2);
+  // if (!end ){
+  //   // throw new Error("missing end in event " + summary);
+  //   // return []
+  // }
   // Calculate the duration of the event for use with recurring 事件.
-  const duration = +end - +start;
+  const duration = +end2 - +start;
   // avoid error
   // const _recurrences = recurrences || [];
   // const _exdate = exdate || [];
