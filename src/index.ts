@@ -135,7 +135,6 @@ export async function generateSchtasksCreationObjects({
         async ({ taskName, startDateString, endDateString, commandOrURL }) => {
           // console.log({ startDateString, endDateString, commandOrURL });
           if (!taskName) throw new Error("taskName is empty");
-
           return [
             startDateString &&
               (await getSchtasksObject({
@@ -286,6 +285,7 @@ function getEventsActions(events: any) {
   return events
     .flatMap(function getEventActions(event) {
       const { start, end, summary, description } = event;
+      const markdown = `# ${summary}\n${description}`;
       const action = null || runCommandMatch(event) || linkActionMatch(event);
       return (
         action && [
