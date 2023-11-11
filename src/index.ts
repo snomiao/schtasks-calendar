@@ -67,7 +67,7 @@ export async function readConfig(argv: {
   ].flatMap((e) => (e ? [e] : []));
   const configYAMLs = await Promise.all(
     possibleConfigPathes
-      .flatMap((e) => (e ? [e] : [])) // filter by boolean
+      .flatMap((e) => (e ? [e] : []))
       .reverse()
       .map(async (configPath) => {
         try {
@@ -126,50 +126,56 @@ export async function generateSchtasksCreationObjects({
     process.exit(1);
   }
   console.log("fetching...");
-  const actions = await fetchCalendarsEventsActions( ICS_URLS, FORWARD_DAYS);
+  const actions = await fetchCalendarsEventsActions(ICS_URLS, FORWARD_DAYS);
 
   console.log("parsing...");
   return (
     await Promise.all(
-      actions
-        .flatMap((e) => (e ? [e] : []))
-        .map(
-          async ({
-            taskName,
-            startDateString,
-            endDateString,
-            commandOrURL,
-          }) => {
-            // console.log({ startDateString, endDateString, commandOrURL });
-            if (!taskName) throw new Error("taskName is empty");
-            const schtasksObject = await getSchtasksObject(
-              taskName,
-              startDateString,
-              endDateString,
-              commandOrURL,
-              SSAC_PREFIX
-            );
-            // console.log(schtasksObject);
-            return schtasksObject;
-          }
-        )
+      actions.map(
+        async ({ taskName, startDateString, endDateString, commandOrURL }) => {
+          // console.log({ startDateString, endDateString, commandOrURL });
+          if (!taskName) throw new Error("taskName is empty");
+
+          return [
+            startDateString &&
+              (await getSchtasksObject({
+                taskName,
+                taskStartDate: new Date(startDateString),
+                commandOrURL,
+                SSAC_PREFIX,
+              })),
+            // endDateString &&
+            //   (await getSchtasksObject({
+            //     taskName,
+            //     taskStartDate: new Date(endDateString),
+            //     commandOrURL,
+            //     SSAC_PREFIX,
+            //   })),
+          ].flatMap((e) => (e ? [e] : []));
+        }
+      )
     )
   )
+    .flat()
     .sort((a, b) => a.schtasksName.localeCompare(b.schtasksName))
     .map((e) => (console.log(e.schtasksName), e));
 }
 
 // [Exe文件开机启动，隐藏运行窗口运行_问道-CSDN博客_开机隐藏运行exe]( https://blog.csdn.net/llag_haveboy/article/details/84675145 )
 // `wscript.createObject("wscript.shell").Run("cmd.exe /C C:\gz\gz.exe", 0, TRUE)`
-async function getSchtasksObject(
-  taskName: string,
-  startDateString: string,
-  endDateString: string,
-  commandOrURL: string,
-  SSAC_PREFIX: string
-) {
-  const S = DateTimeAssembly(new Date(startDateString));
-  const E = DateTimeAssembly(new Date(endDateString));
+async function getSchtasksObject({
+  taskName,
+  taskStartDate,
+  commandOrURL,
+  SSAC_PREFIX,
+}: {
+  taskName: string;
+  taskStartDate: Date;
+  commandOrURL: string;
+  SSAC_PREFIX: string;
+}) {
+  const S = DateTimeAssembly(taskStartDate);
+  // const E = DateTimeAssembly(taskStartDate);
   // const dateParams = `/SC ONCE /SD ${S.D} /ST ${S.T} /ED ${E.D} /ET ${E.T} /Z`; // the option ONCE does not support /ED (and /Z)
   // const dateParams = `/SC ONCE /SD ${S.D} /ST ${S.T} /ET ${E.T} /Z`; // /ET is used to repeat tasks and runs every 10 minutes if there is a /ET.
   // const dateParams = `/SC ONCE /SD ${S.D} /ST ${S.T} /Z`; // ERROR: Need End Boundary
@@ -177,9 +183,8 @@ async function getSchtasksObject(
   const dateParams = `/SC ONCE /SD ${S.D} /ST ${S.T}`; // OK BUT will not delete task after complete..
 
   // [schtasks | Microsoft Docs]( https://docs.microsoft.com/en-us/windows-server/administration/windows-commands/schtasks )
-  const taskStartDate = new Date(startDateString);
   const taskStartDateShortString = new Date(
-    +new Date(startDateString) - new Date().getTimezoneOffset() * 60e3
+    +new Date(taskStartDate) - new Date().getTimezoneOffset() * 60e3
   )
     .toISOString()
     .replace(/[^\dT]/g, "")
@@ -188,6 +193,7 @@ async function getSchtasksObject(
   const taskID = `${taskStartDate.toISOString()}-${commandOrURL}`;
   const taskHash = sha1(taskID);
   const schtasksName = `${SSAC_PREFIX}${taskStartDateShortString}-${taskName}`;
+
   // console.log(schtasksName);
   // TODO FIXME: 貌似普通指令没有静默成功……
   //
@@ -195,7 +201,7 @@ async function getSchtasksObject(
   // const slientlyRunCommandRaw = isUrl(commandOrURL) ? 'explorer ' + `"${escapeCommand(commandOrURL)}"` : 'CMD /c start "SSAC" "' + escapeCommand(commandOrURL) + '"'
   // const slientlyRunCommand = (slientlyRunCommandRaw.length <= 250) ? slientlyRunCommandRaw : await mkCommandWrapperFile(taskHash, slientlyRunCommandRaw)
   //
-  // 全部使用wrapper
+  // all of them use wrapper
   const slientlyRunCommand = await commandWrapperFileCreate(
     taskHash,
     commandOrURL
@@ -249,7 +255,9 @@ async function fetchCalendarsEventsActions(
           await fetchCalendarEventsActions(ics_url, FORWARD_DAYS)
       )
     )
-  ).flat(1);
+  )
+    .flat(1)
+    .flatMap((e) => (e ? [e] : []));
 }
 
 async function fetchCalendarEventsActions(
@@ -269,7 +277,7 @@ async function fetchCalendarEventsActions(
       const actions = getEventsActions(events);
       return actions;
     })
-    .filter((e) => e)
+    .flatMap((e) => (e ? [e] : []))
     .flat(1);
   return actions;
 }
