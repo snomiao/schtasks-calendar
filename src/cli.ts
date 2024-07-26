@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env bun
 /**
  * schtasks-calendar (schcal)
  * Author: snomiao (snomiao@gmail.com)
