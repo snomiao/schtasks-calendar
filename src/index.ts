@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 import { csvParseRows } from "d3";
+import dayjs from "dayjs";
 import { readFile } from "fs/promises";
 import { CalendarComponent } from "ical";
 import sanitize from "sanitize-filename-truncate";
@@ -86,7 +87,7 @@ export async function readConfig(argv: {
     // ...process.env,
     // ...configFromYAMLs,
     // ...argv,
-    ICS_URLS: [y.ICS_URLS, argv.ICS_URLS, argv._?.map(String)]
+    ICS_URLS: [y.ICS_URLS, argv.ICS_URLS]
       .flat()
       .filter((e) => e),
   };
@@ -224,7 +225,9 @@ function DateTimeAssembly(date: Date) {
   return {
     D_Locale: date.toLocaleDateString(),
     T_Locale: date.toLocaleTimeString(),
-    D: [YYYY, MM, DD].join("/"),
+    D: dayjs(new Date([YYYY, MM, DD].join("-"))).format(
+      (process.env.DATE_FORMAT ??= "MM/DD/YYYY")
+    ),
     T: [hh, mm, ss].join(":"),
   };
 }
@@ -335,9 +338,10 @@ function getRangeEvents(
 ) {
   const { summary, description, start, end, rrule, recurrences, exdate } =
     vEvent;
-  if (!summary) throw new Error("missing summary in event");
+  if (!summary) return [];
+  // throw new Error("missing summary in event " + JSON.stringify(vEvent));
   if (!end || !start)
-    throw new Error("missing start or end in event " + summary);
+    throw new Error("missing start or end in event " + JSON.stringify(vEvent));
   // Calculate the duration of the event for use with recurring 事件.
   const duration = +end - +start;
   // avoid error
@@ -347,8 +351,8 @@ function getRangeEvents(
   // if (!exdate) throw new Error("missing exdate in event " + summary);
   const exdatesKeys = !exdate ? [] : Object.keys(exdate); // datestr or undefined
   // exdatesKeys == [ '2020-03-05' ]
-  if (!recurrences) throw new Error("missing recurrences in event " + summary);
-  const recurrencesKeys = Object.keys(recurrences?.map((e) => e.exdate)); // datestr or undefined
+  // if (!recurrences) DIEError("Missing recurrences in event " + summary);
+  const recurrencesKeys = Object.keys(recurrences?.map((e) => e.exdate) ?? {}); // datestr or undefined
   // recurrencesKeys == [ '2020-03-05' ]
   //
   // First determine a fuzzy range date here,
