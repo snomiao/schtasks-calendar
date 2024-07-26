@@ -3,6 +3,6 @@ config.yaml
 node_modules
 cache*
 publish.bat
-.env
+.env*
 dist
 bun.lockb
