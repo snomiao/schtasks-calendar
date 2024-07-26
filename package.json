@@ -38,7 +38,9 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "bun": "^1.1.20",
     "ical": "^0.8.0",
+    "phpdie": "^1.2.5",
     "sanitize-filename-truncate": "^1.0.2",
     "tunnel": "^0.0.6"
   },

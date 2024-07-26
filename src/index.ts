@@ -51,12 +51,12 @@ export async function outdatedSchtasksClean(
 }
 
 export async function readConfig(argv: {
-  config: string;
-  CACHE_TIMEOUT: number;
-  HTTP_PROXY: string;
-  FORWARD_DAYS: number;
-  ICS_URLS: string | string[];
-  _: (number | string)[];
+  config?: string;
+  CACHE_TIMEOUT?: number;
+  HTTP_PROXY?: string;
+  FORWARD_DAYS?: number;
+  ICS_URLS?: string | string[];
+  // _: (number | string)[];
 }) {
   const possibleConfigPathes = [
     argv.config,
