@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 import { csvParseRows } from "d3";
+import dayjs from "dayjs";
 import { readFile } from "fs/promises";
 import { CalendarComponent } from "ical";
 import sanitize from "sanitize-filename-truncate";
@@ -9,8 +10,6 @@ import { promisify } from "util";
 import yaml from "yaml";
 import commandWrapperFileCreate from "./commandWrapperFileCreate";
 import icalObjectFetch from "./icalObjectFetch";
-import DIE, { DIEError } from "phpdie";
-import dayjs from "dayjs";
 
 export async function newSchtasksImport(
   schtasksCreationObjects: Awaited<
@@ -53,12 +52,12 @@ export async function outdatedSchtasksClean(
 }
 
 export async function readConfig(argv: {
-  config: string;
-  CACHE_TIMEOUT: number;
-  HTTP_PROXY: string;
-  FORWARD_DAYS: number;
-  ICS_URLS: string | string[];
-  _: (number | string)[];
+  config?: string;
+  CACHE_TIMEOUT?: number;
+  HTTP_PROXY?: string;
+  FORWARD_DAYS?: number;
+  ICS_URLS?: string | string[];
+  // _: (number | string)[];
 }) {
   const possibleConfigPathes = [
     argv.config,
@@ -88,7 +87,7 @@ export async function readConfig(argv: {
     // ...process.env,
     // ...configFromYAMLs,
     // ...argv,
-    ICS_URLS: [y.ICS_URLS, argv.ICS_URLS, argv._?.map(String)]
+    ICS_URLS: [y.ICS_URLS, argv.ICS_URLS]
       .flat()
       .filter((e) => e),
   };
