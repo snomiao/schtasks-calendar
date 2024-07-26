@@ -9,7 +9,6 @@ cd %~dp0
 npx schcal > schcal.log
 schtasks /Create /tn SSAC /sc daily /st 17:00 /tr %0 /F
 
-
 REM 
 REM test by manual please or this will fall in infinite loop...
 REM 

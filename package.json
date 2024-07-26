@@ -19,7 +19,8 @@
   "type": "module",
   "exports": {
     "require": "./dist/index.cjs",
-    "import": "./dist/index.mjs"
+    "import": "./dist/index.mjs",
+    "types": "./dist/index.d.ts"
   },
   "main": "dist/index.min.cjs",
   "module": "dist/index.min.mjs",
@@ -33,12 +34,15 @@
   "scripts": {
     "build": "npx snobuild",
     "prepack": "npm run build",
-    "semantic-release": "semantic-release",
+    "release": "semantic-release",
     "start": "tsx src/cli.ts",
     "test": "vitest run"
   },
   "dependencies": {
+    "bun": "^1.1.20",
+    "dayjs": "^1.11.12",
     "ical": "^0.8.0",
+    "phpdie": "^1.2.5",
     "sanitize-filename-truncate": "^1.0.2",
     "tunnel": "^0.0.6"
   },
