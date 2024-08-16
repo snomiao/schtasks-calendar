@@ -272,7 +272,7 @@ function getEventsActions(events: any) {
   return events
     .flatMap(function getEventActions(event) {
       const { start, end, summary, description } = event;
-      const action = null || runCommandMatch(event) || linkActionMatch(event);
+      const action = null || runCommandMatch(event) || linkActionMatch(event) || chromeActionMatch(event);
       return (
         action && [
           {
@@ -306,6 +306,28 @@ function linkActionMatch(event: any) {
     (() => {
       const [, 标题, 链接] = matchedContent;
       return { commandOrURL: 链接, taskName: 标题 };
+    })()
+  );
+}
+
+function chromeActionMatch(event: any) {
+  // (chrome-extension://.*)
+  const description = innerText(event?.description || ""); // ASSUME THE HTML IS GOOD AT FORMAT
+  const summary = event?.summary;
+  // markdown style
+  const matchedContent =
+    summary?.match(
+      /(.*)((?:chrome-extension):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/
+    ) ||
+    description?.match(
+      /(.*)((?:chrome-extension):\/\/[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|])/
+    );
+
+  return (
+    matchedContent &&
+    (() => {
+      const [, 标题, 链接] = matchedContent;
+      return { commandOrURL: "chrome " + 链接, taskName: 标题 };
     })()
   );
 }
